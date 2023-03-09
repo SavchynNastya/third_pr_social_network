@@ -11,6 +11,7 @@ class Post extends StatefulWidget {
 
 class _Post extends State<Post>{
   bool liked = false;
+  bool saved = false;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +73,16 @@ class _Post extends State<Post>{
                   const Icon(Icons.share),
                 ],
               ),
-              const Icon(Icons.bookmark),
+              IconButton(
+                icon: Icon(
+                  saved ? Icons.bookmark : Icons.bookmark_border,
+                ),
+                onPressed: () {
+                  setState(() {
+                    saved = !saved;
+                  });
+                },
+              ),
             ],
           ),
         ),

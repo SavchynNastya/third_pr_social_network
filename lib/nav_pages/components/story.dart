@@ -14,9 +14,23 @@ class Story extends StatelessWidget {
         Container(
           width: 60,
           height: 60,
-          decoration: const BoxDecoration(
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: Colors.grey,
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft, 
+              end: Alignment.centerRight,
+              colors: [Colors.purple.shade800, Colors.orange.shade600],
+            ), 
+          ),
+          child: Container(
+            width: 55,
+            height: 55,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.grey,
+            ),
           ),
         ),
         const SizedBox(
