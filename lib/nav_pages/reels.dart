@@ -30,13 +30,11 @@ class Reels extends StatelessWidget{
           ),
         ),
       ),
-      body: Expanded(
-        child: PageView(
-          scrollDirection: Axis.vertical,
-          controller: _pageController,
-          padEnds: false,
-          children: reels,
-        ),
+      body: PageView(
+        scrollDirection: Axis.vertical,
+        controller: _pageController,
+        padEnds: false,
+        children: reels,
       ),
     );
   }

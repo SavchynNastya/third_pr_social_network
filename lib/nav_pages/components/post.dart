@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 class Post extends StatefulWidget {
   final String username;
-  const Post({super.key, required this.username});
+  final int id;
+  const Post({super.key, required this.username, required this.id});
   
   @override
   State<Post> createState() => _Post();
@@ -45,9 +46,25 @@ class _Post extends State<Post>{
                 const Icon(Icons.more_vert),
               ],
             )),
-        Container(
-          height: 400,
-          color: Colors.grey[400],
+        Hero(
+          tag: 'post${widget.id}', 
+          child: Material(
+            type: MaterialType.transparency,
+            child: Container(
+              height: 400,
+              width: MediaQuery.of(context).size.width,
+              color: Colors.grey[400],
+              child: Center(
+                child: Text(
+                  "${widget.id}",
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 60,
+                      fontWeight: FontWeight.bold),
+                ),
+              )
+            ),
+          )
         ),
         Padding(
           padding: const EdgeInsets.all(5.0),

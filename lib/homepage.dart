@@ -15,6 +15,14 @@ class HomePage extends StatefulWidget{
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
   int _selectedItem = 0;
 
+  final PageController _pageController = PageController();
+
+  @override
+  void dispose(){
+    _pageController.dispose();
+    super.dispose();
+  }
+
   static const List usernames = [
     'tatasiyka',
     'lyboff',
@@ -30,22 +38,31 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
   void _navigateBottomNavBar(int index){
     setState(() {
       _selectedItem = index;
+      _pageController.animateToPage(index, duration: const Duration(milliseconds: 500), curve: Curves.easeInCubic);
     });
   }
-
-  final List<Widget> _children = [
-    const Feeds(usernames: usernames, currentUsername: currentUsername),
-    const Search(),
-    const AddPhoto(),
-    Reels(usernames: usernames),
-    const Account(currentUsername: currentUsername),
-  ];
 
 
   @override
   Widget build(BuildContext context){
     return Scaffold(
-      body: _children[_selectedItem],
+      body: SizedBox.expand(
+        child: PageView(
+          controller: _pageController,
+          onPageChanged: (value) {
+            setState(() {
+              _selectedItem = value;
+            });
+          },
+          children: [
+            Feeds(usernames, currentUsername),
+            const Search(),
+            const AddPhoto(),
+            Reels(usernames: usernames),
+            const Account(currentUsername: currentUsername, usernames: usernames),
+          ],
+        ),
+      ),
       bottomNavigationBar: BottomNavigationBar(
         selectedIconTheme: const IconThemeData(color: Colors.black),
         currentIndex: _selectedItem,

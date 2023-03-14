@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:social_network/nav_pages/components/post_preview.dart';
+import 'package:social_network/nav_pages/posts_viewer.dart';
+import 'package:social_network/nav_pages/direct.dart';
 
 class Account extends StatefulWidget {
   final String currentUsername;
+  final List usernames;
 
-  const Account({super.key, required this.currentUsername});
+  const Account({super.key, required this.currentUsername, required this.usernames});
 
   @override
   State<Account> createState() => _Account();
@@ -14,10 +18,13 @@ class _Account extends State<Account>{
   bool _isTapped = false;
 
   final ButtonStyle elevatedButtonStyle = ElevatedButton.styleFrom(
-      foregroundColor: Colors.black26,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ));
+    foregroundColor: Colors.black26,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(10)),
+    )
+  );
+
+  // final posts = Post()
 
   @override
   Widget build(BuildContext context) {
@@ -29,19 +36,51 @@ class _Account extends State<Account>{
         backgroundColor: Colors.transparent,
         elevation: 0,
         title:
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, 
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, 
             children: [
               Text(widget.currentUsername, style: const TextStyle(color: Colors.black)),
-              Row(
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.all(24),
-                    child: Icon(Icons.add_box_outlined),
-                  ),
-                  Icon(Icons.menu),
-                ],
-              )
-            ]),
+              const Icon(Icons.add_box_outlined, color: Colors.black),
+            ],
+          ),
+      ),
+      endDrawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.grey,
+              ),
+              child: Text('Profile Menu', style: TextStyle(color: Colors.white),),
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.messenger_outline_sharp,
+                color: Colors.grey,
+              ),
+              title: const Text('Direct'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Direct(
+                          currentUsername: widget.currentUsername,
+                          usernames: widget.usernames)),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(
+                Icons.settings,
+                color: Colors.grey,
+              ),
+              title: const Text('Settings'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
       ),
       body: Column(children: [
         Padding(
@@ -230,14 +269,54 @@ class _Account extends State<Account>{
             children: 
               _isTapped ? 
                 List.generate(2, (index) {
-                  return Container(color: Colors.grey[300]);
+                  index += 17;
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => PostsViewer(widget.currentUsername, index, 2)),
+                      );
+                    },
+                    child: Hero(
+                      tag: 'post$index',
+                      child: Material(
+                        type: MaterialType.transparency,
+                        child: PostPreview(id: index),
+                      ),
+                    ),
+                  );
                 }) :
                 List.generate(17, (index) {
-                  return Container(color: Colors.grey[300]);
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => PostsViewer(widget.currentUsername, index, 17)),
+                      );
+                    },
+                    child: Hero(
+                      tag: 'post$index',
+                      child: Material(
+                        type: MaterialType.transparency,
+                        child: PostPreview(id: index),
+                      ),
+                    ),
+                  );
                 }),
           ),
         ),
       ]),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Direct(
+                    currentUsername: widget.currentUsername, usernames: widget.usernames)),
+          );
+        },
+        child: const Icon(Icons.message, color: Colors.black),
+      ),
     );
   }
 }
