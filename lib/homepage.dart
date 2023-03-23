@@ -8,6 +8,7 @@ import 'nav_pages/add_photo.dart';
 import 'nav_pages/reels.dart';
 import 'nav_pages/components/post.dart';
 import 'nav_pages/components/comment.dart';
+import 'dart:async';
 
 class HomePage extends StatefulWidget{
   const HomePage ({Key? key}) : super(key: key);
@@ -24,6 +25,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
   final List<Widget> _children = [];
 
   String uid = FirebaseAuth.instance.currentUser!.uid;
+
+  final StreamController<List<Comment>> _commentsStreamController =
+      StreamController<List<Comment>>.broadcast();
+
   late String username;
 
   void getUserData() async {
@@ -34,6 +39,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
       username = (userSnap.data() as Map<String, dynamic>)['username'];
     });
   }
+
+  @override
+  void dispose() {
+    _commentsStreamController.close();
+    super.dispose();
+  }
+
 
   void updateComments(String commentText, int postId){
     setState(() {
@@ -53,6 +65,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
         for(var post in mentionedPosts){
           post.comments = comments.where((comment) => comment.postId == post.id).toList();
         }
+
+        _commentsStreamController.sink.add(comments);
+        print(_commentsStreamController);
+
     });
   }
 
@@ -165,29 +181,29 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
   static const String currentUsername = 'tatasiyka';
 
   static List<PostCard> feedPosts = [
-    PostCard(username: usernames[0], id: 1, imageUrl: images[0], likes: 3, comments: comments.where((comment) => comment.postId == 1).toList(), updateLikedPosts: null, updateSavedPosts: null, updateComments: null,),
-    PostCard(username: usernames[1], id: 2, imageUrl: images[1], likes: 1, comments: comments.where((comment) => comment.postId == 2).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null,),
-    PostCard(username: usernames[2], id: 3, imageUrl: images[2], likes: 15, comments: comments.where((comment) => comment.postId == 3).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null,),
-    PostCard(username: usernames[3], id: 4, imageUrl: images[3], likes: 100, comments: comments.where((comment) => comment.postId == 4).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null,),
-    PostCard(username: usernames[0], id: 5, imageUrl: images[4], likes: 12, comments: comments.where((comment) => comment.postId == 5).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null,),
-    PostCard(username: usernames[1], id: 6, imageUrl: images[5], likes: 6, comments: comments.where((comment) => comment.postId == 6).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null,),
-    PostCard(username: usernames[2], id: 7, imageUrl: images[6], likes: 8, comments: comments.where((comment) => comment.postId == 7).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null,),
+    PostCard(username: usernames[0], id: 1, imageUrl: images[0], likes: 3, comments: comments.where((comment) => comment.postId == 1).toList(), updateLikedPosts: null, updateSavedPosts: null, updateComments: null, commentsStream: null,),
+    PostCard(username: usernames[1], id: 2, imageUrl: images[1], likes: 1, comments: comments.where((comment) => comment.postId == 2).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null, commentsStream: null,),
+    PostCard(username: usernames[2], id: 3, imageUrl: images[2], likes: 15, comments: comments.where((comment) => comment.postId == 3).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null, commentsStream: null,),
+    PostCard(username: usernames[3], id: 4, imageUrl: images[3], likes: 100, comments: comments.where((comment) => comment.postId == 4).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null, commentsStream: null,),
+    PostCard(username: usernames[0], id: 5, imageUrl: images[4], likes: 12, comments: comments.where((comment) => comment.postId == 5).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null, commentsStream: null,),
+    PostCard(username: usernames[1], id: 6, imageUrl: images[5], likes: 6, comments: comments.where((comment) => comment.postId == 6).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null, commentsStream: null,),
+    PostCard(username: usernames[2], id: 7, imageUrl: images[6], likes: 8, comments: comments.where((comment) => comment.postId == 7).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null, commentsStream: null,),
   ];
 
   static List<PostCard> accountPosts = [
-    PostCard(username: currentUsername, id: 8, imageUrl: images[7], likes: 3, comments: comments.where((comment) => comment.postId == 8).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null,),
-    PostCard(username: currentUsername, id: 9, imageUrl: images[8], likes: 1, comments: comments.where((comment) => comment.postId == 9).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null,),
-    PostCard(username: currentUsername, id: 10, imageUrl: images[9], likes: 15, comments: comments.where((comment) => comment.postId == 10).toList(), updateLikedPosts: null, updateSavedPosts: null, updateComments: null,),
-    PostCard(username: currentUsername, id: 11, imageUrl: images[10], likes: 100, comments: comments.where((comment) => comment.postId == 11).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null,),
-    PostCard(username: currentUsername, id: 12, imageUrl: images[11], likes: 12, comments: comments.where((comment) => comment.postId == 12).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null,),
-    PostCard(username: currentUsername, id: 13, imageUrl: images[12], likes: 6, comments: comments.where((comment) => comment.postId == 13).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null,),
-    PostCard(username: currentUsername, id: 14, imageUrl: images[13], likes: 8, comments: comments.where((comment) => comment.postId == 14).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null,),
-    PostCard(username: currentUsername, id: 15, imageUrl: images[14], likes: 8, comments: comments.where((comment) => comment.postId == 15).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null,),
+    PostCard(username: currentUsername, id: 8, imageUrl: images[7], likes: 3, comments: comments.where((comment) => comment.postId == 8).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null, commentsStream: null,),
+    PostCard(username: currentUsername, id: 9, imageUrl: images[8], likes: 1, comments: comments.where((comment) => comment.postId == 9).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null, commentsStream: null,),
+    PostCard(username: currentUsername, id: 10, imageUrl: images[9], likes: 15, comments: comments.where((comment) => comment.postId == 10).toList(), updateLikedPosts: null, updateSavedPosts: null, updateComments: null, commentsStream: null,),
+    PostCard(username: currentUsername, id: 11, imageUrl: images[10], likes: 100, comments: comments.where((comment) => comment.postId == 11).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null, commentsStream: null,),
+    PostCard(username: currentUsername, id: 12, imageUrl: images[11], likes: 12, comments: comments.where((comment) => comment.postId == 12).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null, commentsStream: null,),
+    PostCard(username: currentUsername, id: 13, imageUrl: images[12], likes: 6, comments: comments.where((comment) => comment.postId == 13).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null, commentsStream: null,),
+    PostCard(username: currentUsername, id: 14, imageUrl: images[13], likes: 8, comments: comments.where((comment) => comment.postId == 14).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null, commentsStream: null,),
+    PostCard(username: currentUsername, id: 15, imageUrl: images[14], likes: 8, comments: comments.where((comment) => comment.postId == 15).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null, commentsStream: null,),
   ];
 
   static List<PostCard> mentionedPosts = [
-    PostCard(username: usernames[0], id: 1, imageUrl: images[0], likes: 3, comments: comments.where((comment) => comment.postId == 1).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null,),
-    PostCard(username: usernames[1], id: 2, imageUrl: images[1], likes: 1, comments: comments.where((comment) => comment.postId == 2).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null,),
+    PostCard(username: usernames[0], id: 1, imageUrl: images[0], likes: 3, comments: comments.where((comment) => comment.postId == 1).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null, commentsStream: null,),
+    PostCard(username: usernames[1], id: 2, imageUrl: images[1], likes: 1, comments: comments.where((comment) => comment.postId == 2).toList(), updateLikedPosts: null,  updateSavedPosts: null, updateComments: null, commentsStream: null,),
   ];
 
   @override
@@ -198,16 +214,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
       post.updateLikedPosts = updateLikedPosts;
       post.updateSavedPosts = updateSavedPosts;
       post.updateComments = updateComments;
+      post.commentsStream = _commentsStreamController.stream;
     }
     for (var post in accountPosts) {
       post.updateLikedPosts = updateLikedPosts;
       post.updateSavedPosts = updateSavedPosts;
       post.updateComments = updateComments;
+      post.commentsStream = _commentsStreamController.stream;
     }
     for (var post in mentionedPosts) {
       post.updateLikedPosts = updateLikedPosts;
       post.updateSavedPosts = updateSavedPosts;
       post.updateComments = updateComments;
+      post.commentsStream = _commentsStreamController.stream;
     }
 
     _children.addAll([
@@ -217,6 +236,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin{
       Reels(usernames: usernames),
       Account(usernames: usernames, posts: accountPosts, mentionedPosts: mentionedPosts, likedPosts: likedPosts, savedPosts: savedPosts),
     ]);
+
+    _commentsStreamController.sink.add(comments);
+    // print(_commentsStreamController.toString());
 
     getUserData();
   }

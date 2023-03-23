@@ -2,20 +2,23 @@
 
 import 'package:flutter/material.dart';
 import 'package:social_network/nav_pages/open_comments.dart';
+import 'dart:async';
+import 'package:social_network/nav_pages/components/comment.dart';
 
 class PostCard extends StatefulWidget {
   final String username;
   final int id;
   final String imageUrl;
-  List comments;
+  List<Comment> comments;
   Function? updateLikedPosts;
   Function? updateSavedPosts;
   Function? updateComments;
+  Stream<List<Comment>>? commentsStream;
   int likes;
   bool liked = false;
   bool saved = false;
   PostCard({super.key, required this.username, required this.id, required this.imageUrl, 
-  required this.likes, required this.comments, required this.updateLikedPosts, required this.updateSavedPosts, required this.updateComments});
+  required this.likes, required this.comments, required this.updateLikedPosts, required this.updateSavedPosts, required this.updateComments, required this.commentsStream});
   
   @override
   State<PostCard> createState() => _PostCard();
@@ -111,6 +114,7 @@ class _PostCard extends State<PostCard>{
                               comments: widget.comments,
                               postId: widget.id,
                               updateComments: widget.updateComments,
+                              commentsStream: widget.commentsStream,
                             )
                           ),
                         );
@@ -157,7 +161,9 @@ class _PostCard extends State<PostCard>{
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => OpenComments(comments: widget.comments, postId: widget.id, updateComments: widget.updateComments,)),
+                        builder: (context) => OpenComments(comments: widget.comments, 
+                          postId: widget.id, updateComments: widget.updateComments, 
+                          commentsStream: widget.commentsStream)),
                   );
                 },
                 child: widget.comments[index],
