@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:social_network/nav_pages/components/post.dart';
 import 'package:social_network/nav_pages/components/story.dart';
 import 'package:social_network/nav_pages/direct.dart';
 import 'package:social_network/nav_pages/liked.dart';
 import 'package:social_network/nav_pages/stories_viewer.dart';
 
 class Feeds extends StatelessWidget {
-  Feeds(this.usernames, this.currentUsername, {super.key}){
+  Feeds(this.usernames, this.currentUsername, this.posts, {super.key}){
     storiesAvailable = List.generate(
       usernames.length,
       (index) => Story(username: usernames[index])
@@ -15,7 +14,7 @@ class Feeds extends StatelessWidget {
 
   final List usernames;
   final String currentUsername;
-
+  final List posts;
   static late List storiesAvailable;
 
   @override
@@ -105,14 +104,12 @@ class Feeds extends StatelessWidget {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: usernames.length,
+                  itemCount: posts.length,
                   itemBuilder: (context, index) {
-                    return Post(
-                      username: usernames[index], id: index
-                    );
+                    return posts[index];
                   }
                 ),
-              )
+              ),
             ],
           ),
         ));

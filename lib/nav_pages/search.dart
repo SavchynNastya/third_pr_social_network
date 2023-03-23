@@ -27,10 +27,15 @@ class Search extends StatelessWidget {
               ),
           ),
       ),
-      body: Row(
+      body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          PostsGrid(),
+        children: [
+          Expanded(
+            child: 
+              SingleChildScrollView(
+                child: PostsGrid(),
+              )
+          ),
         ],
       )
     );

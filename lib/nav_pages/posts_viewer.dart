@@ -2,25 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:social_network/nav_pages/components/post.dart';
 
 class PostsViewer extends StatelessWidget {
-  final String username;
-  final int id;
-  final int postsQuantity;
+  final int initial;
+  final List<PostCard> posts;
   late final PageController _pageController;
 
-  PostsViewer(this.username, this.id, this.postsQuantity, {super.key}){
-    _pageController = PageController(initialPage: id);
+  PostsViewer(this.initial, this.posts, {super.key}){
+    _pageController = PageController(initialPage: initial);
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> userPosts = List.generate(postsQuantity, (index) {
-      if(id < 17) {
-        return Post(username: username, id: index);
-      } else {
-        return Post(username: username, id: index+id-1);
-      }
-    });
-
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(
@@ -35,7 +26,7 @@ class PostsViewer extends StatelessWidget {
         scrollDirection: Axis.vertical,
         controller: _pageController,
         padEnds: false,
-        children: userPosts,
+        children: posts,
       ),
     );
   }

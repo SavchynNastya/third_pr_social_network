@@ -1,19 +1,28 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: prefer_const_constructors
 
-class Post extends StatefulWidget {
+import 'package:flutter/material.dart';
+import 'package:social_network/nav_pages/open_comments.dart';
+
+class PostCard extends StatefulWidget {
   final String username;
   final int id;
-  const Post({super.key, required this.username, required this.id});
+  final String imageUrl;
+  List comments;
+  Function? updateLikedPosts;
+  Function? updateSavedPosts;
+  Function? updateComments;
+  int likes;
+  bool liked = false;
+  bool saved = false;
+  PostCard({super.key, required this.username, required this.id, required this.imageUrl, 
+  required this.likes, required this.comments, required this.updateLikedPosts, required this.updateSavedPosts, required this.updateComments});
   
   @override
-  State<Post> createState() => _Post();
+  State<PostCard> createState() => _PostCard();
 }
 
 
-class _Post extends State<Post>{
-  bool liked = false;
-  bool saved = false;
-
+class _PostCard extends State<PostCard>{
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -53,16 +62,13 @@ class _Post extends State<Post>{
             child: Container(
               height: 400,
               width: MediaQuery.of(context).size.width,
-              color: Colors.grey[400],
-              child: Center(
-                child: Text(
-                  "${widget.id}",
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 60,
-                      fontWeight: FontWeight.bold),
+              // color: Colors.grey[400],
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(widget.imageUrl),
+                  fit: BoxFit.cover,
                 ),
-              )
+              ),
             ),
           )
         ),
@@ -73,30 +79,56 @@ class _Post extends State<Post>{
             children: [
               Row(
                 children: [
-                  IconButton(
-                    icon: Icon(
-                      liked ? Icons.favorite : Icons.favorite_outline,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        liked = !liked;
-                      });
-                    },
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: widget.liked
+                            ? Icon(Icons.favorite, color: Colors.red[900])
+                            : const Icon(Icons.favorite_outline),
+                        onPressed: () {
+                          setState(() {
+                            if (widget.liked) {
+                              widget.likes--;
+                            } else {
+                              widget.likes++;
+                            }
+                            widget.liked = !widget.liked;
+                            widget.updateLikedPosts?.call(widget.id);
+                          });
+                        },
+                      ),
+                      Text("${widget.likes}", style: const TextStyle(color: Colors.black),),
+                    ],
                   ),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12.0),
-                    child: Icon(Icons.chat_bubble_outline),
+                    child: IconButton(
+                      onPressed: (){
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => OpenComments(
+                              comments: widget.comments,
+                              postId: widget.id,
+                              updateComments: widget.updateComments,
+                            )
+                          ),
+                        );
+                      }, 
+                      icon: Icon(Icons.chat_bubble_outline)
+                    )
                   ),
                   const Icon(Icons.share),
                 ],
               ),
               IconButton(
                 icon: Icon(
-                  saved ? Icons.bookmark : Icons.bookmark_border,
+                  widget.saved ? Icons.bookmark : Icons.bookmark_border,
                 ),
                 onPressed: () {
                   setState(() {
-                    saved = !saved;
+                    widget.saved = !widget.saved;
+                    widget.updateSavedPosts?.call(widget.id);
                   });
                 },
               ),
@@ -115,22 +147,22 @@ class _Post extends State<Post>{
           ),
         ),
         Padding(
-          padding: const EdgeInsets.only(left: 16.0, top: 0),
-          child: RichText(
-            text: TextSpan(style: const TextStyle(color: Colors.black), children: [
-              TextSpan(
-                text: widget.username,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const WidgetSpan(
-                child: SizedBox(
-                  width: 5,
-                ),
-              ),
-              const TextSpan(
-                text: 'nice photo',
-              )
-            ]),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: widget.comments.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => OpenComments(comments: widget.comments, postId: widget.id, updateComments: widget.updateComments,)),
+                  );
+                },
+                child: widget.comments[index],
+              );
+            },
           ),
         ),
       ],
