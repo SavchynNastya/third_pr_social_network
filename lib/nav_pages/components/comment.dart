@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:social_network/models/comment.dart' as comment_model;
 
 class Comment extends StatelessWidget {
-  final int id;
-  final int postId;
-  final String username;
-  final String commentText;
-  const Comment({super.key, required this.id, required this.postId, required this.username, required this.commentText});
+  // final int id;
+  // final int postId;
+  // final String username;
+  // final String commentText;
+  final comment_model.Comment comment;
+  const Comment({super.key, required this.comment});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +19,7 @@ class Comment extends StatelessWidget {
             style: const TextStyle(color: Colors.black), 
             children: [
               TextSpan(
-                text: username,
+                text: comment.username,
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const WidgetSpan(
@@ -26,7 +28,7 @@ class Comment extends StatelessWidget {
                 ),
               ),
               TextSpan(
-                text: commentText,
+                text: comment.commentText,
               ),
             ]
           ),

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:social_network/nav_pages/components/post.dart';
+import 'package:social_network/models/post.dart';
 
 class LikedPosts extends StatelessWidget {
-  final List<PostCard> likedPosts;
+  final List<Post> likedPosts;
   const LikedPosts({super.key, required this.likedPosts});
 
   @override
@@ -29,7 +30,7 @@ class LikedPosts extends StatelessWidget {
                 ListView.builder(
                   itemCount: likedPosts.length,
                   itemBuilder: (context, index) {
-                    return likedPosts[index];
+                    return PostCard(post: likedPosts[index]);
                   }
                 ),
             ),

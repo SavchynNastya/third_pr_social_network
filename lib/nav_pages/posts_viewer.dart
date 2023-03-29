@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:social_network/models/posts_model.dart';
 import 'package:social_network/nav_pages/components/post.dart';
+import 'package:provider/provider.dart';
 
 class PostsViewer extends StatelessWidget {
   final int initial;
-  final List<PostCard> posts;
+  final List posts;
   late final PageController _pageController;
 
   PostsViewer(this.initial, this.posts, {super.key}){
@@ -22,11 +24,25 @@ class PostsViewer extends StatelessWidget {
         title: const Text('Posts',
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
       ),
-      body: PageView(
-        scrollDirection: Axis.vertical,
-        controller: _pageController,
-        padEnds: false,
-        children: posts,
+      // body: PageView(
+      //   scrollDirection: Axis.vertical,
+      //   controller: _pageController,
+      //   padEnds: false,
+      //   children: [
+      //     for (var post in posts) PostCard(post: post),
+      //   ],
+      // ),
+      body: Consumer<PostsModel>(
+        builder: (context, provider, _) {
+          return PageView(
+            scrollDirection: Axis.vertical,
+            controller: _pageController,
+            padEnds: false,
+            children: [
+              for (var post in provider.posts) PostCard(post: post),
+            ],
+          );
+        },
       ),
     );
   }

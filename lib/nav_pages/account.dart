@@ -1,97 +1,124 @@
-// ignore_for_file: prefer_const_constructors_in_immutables
+// ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:social_network/models/story_collection.dart';
+import 'package:social_network/models/story_collection_model.dart';
+import 'package:social_network/nav_pages/components/collection_viewer.dart';
 import 'package:social_network/nav_pages/components/post_preview.dart';
+import 'package:social_network/nav_pages/components/story_collection_circle.dart';
 import 'package:social_network/nav_pages/liked_posts.dart';
 import 'package:social_network/nav_pages/saved_posts.dart';
 import 'package:social_network/nav_pages/posts_viewer.dart';
-import 'package:social_network/nav_pages/direct.dart';
+// import 'package:social_network/nav_pages/direct.dart';
 import 'package:social_network/nav_pages/components/post.dart';
 import 'package:social_network/authentication/auth.dart';
 import 'package:social_network/nav_pages/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:social_network/models/user_model.dart';
+import 'package:provider/provider.dart';
+import 'package:social_network/models/posts_model.dart';
+import 'package:social_network/errors_display/snackbar.dart';
+import 'package:social_network/models/post.dart';
+import 'package:social_network/models/user.dart' as UserStructure;
 
 class Account extends StatefulWidget {
-  final List usernames;
-  final List<PostCard> posts;
-  final List<PostCard> mentionedPosts;
-  final List<PostCard> likedPosts;
-  final List<PostCard> savedPosts;
+  // final List usernames;
+  // final List<PostCard> posts;
+  // final List<PostCard> mentionedPosts;
+  // final List<PostCard> likedPosts;
+  // final List<PostCard> savedPosts;
+  final String userId;
 
-  Account(
-      {super.key,
-      required this.posts,
-      required this.usernames,
-      required this.mentionedPosts,
-      required this.likedPosts,
-      required this.savedPosts});
+  Account({super.key, required this.userId});
 
   @override
   State<Account> createState() => _Account();
 }
 
 class _Account extends State<Account> {
-  late String username;
-  late String photoUrl;
-  late List followers;
-  late List following;
-  String uid = FirebaseAuth.instance.currentUser!.uid;
+  // late String username;
+  // late String photoUrl;
+  // late List followers;
+  // late List following;
+  // String uid = FirebaseAuth.instance.currentUser!.uid;
 
   bool _loading = false;
+  // var userData = {};
+  // int postLen = 0;
+  int followers = 0;
+  int following = 0;
+  bool isFollowing = false;
+  // var posts = [];
 
-  @override
-  void initState() {
-    super.initState();
-    getUserData();
-  }
+  // if user is a current authorized
+  // List<Post> savedPosts = [];
+  // List<Post> likedPosts = [];
 
-  void getUserData() async {
-    setState(() {
-      _loading = true;
-    });
+  // @override
+  // void initState() async{
+  //   super.initState();
+  //   user = UserModel();
+  //   user.fetchUserById(widget.userId);
+  //   print(user.username);
+  // }
 
-    DocumentSnapshot userSnap =
-        await FirebaseFirestore.instance.collection('users').doc(uid).get();
-    // DocumentSnapshot postSnap =
-    //     await FirebaseFirestore.instance.collection('posts').doc(uid).get();
+  // void getUserData() async {
+  //   setState(() {
+  //     _loading = true;
+  //   });
 
-    setState(() {
-      photoUrl = (userSnap.data() as Map<String, dynamic>)['photoUrl'];
-      username = (userSnap.data() as Map<String, dynamic>)['username'];
-      followers = (userSnap.data() as Map<String, dynamic>)['followers'];
-      following = (userSnap.data() as Map<String, dynamic>)['following'];
+  //   DocumentSnapshot userSnap =
+  //       await FirebaseFirestore.instance.collection('users').doc(uid).get();
+  //   // DocumentSnapshot postSnap =
+  //   //     await FirebaseFirestore.instance.collection('posts').doc(uid).get();
 
-      _loading = false;
-    });
-  }
+  //   setState(() {
+  //     photoUrl = (userSnap.data() as Map<String, dynamic>)['photoUrl'];
+  //     username = (userSnap.data() as Map<String, dynamic>)['username'];
+  //     followers = (userSnap.data() as Map<String, dynamic>)['followers'];
+  //     following = (userSnap.data() as Map<String, dynamic>)['following'];
+
+  //     _loading = false;
+  //   });
+  // }
 
   bool _isTapped = false;
 
   final ButtonStyle elevatedButtonStyle = ElevatedButton.styleFrom(
-      foregroundColor: Colors.black26,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      )
-    );
+    foregroundColor: Colors.white,
+    backgroundColor: Color.fromARGB(255, 192, 192, 192),
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(10)),
+    ),
+  );
+
+  final ButtonStyle blueButtonsStyle = ElevatedButton.styleFrom(
+    foregroundColor: Colors.white, 
+    backgroundColor: Colors.blue[350],
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(10)),
+    ),
+  );
+
+  // late UserModel user;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserModel>(context);
+    user.fetchUserById(widget.userId);
+    Provider.of<PostsModel>(context).fetchPosts(widget.userId);
+    // print(FirebaseAuth.instance.currentUser!.uid);
+    // print(widget.userId);
+    // print(user.username);
     return _loading
-        ? Scaffold(
-            body: SafeArea(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    CircularProgressIndicator(
-                      color: Colors.blue.shade500,
-                    )
-                  ],
-                ),
-              ),
-            ),
+        ? const Center(
+            child: CircularProgressIndicator(),
           )
         : Scaffold(
             appBar: AppBar(
@@ -103,101 +130,132 @@ class _Account extends State<Account> {
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(username, style: const TextStyle(color: Colors.black)),
+                  Text(user.username,
+                      style: const TextStyle(color: Colors.black)),
                   const Icon(Icons.add_box_outlined, color: Colors.black),
                 ],
               ),
             ),
-            endDrawer: Drawer(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  const DrawerHeader(
-                    decoration: BoxDecoration(
-                      color: Colors.grey,
-                    ),
-                    child: Text(
-                      'Profile Menu',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  ListTile(
-                    leading: const Icon(
-                      Icons.messenger_outline_sharp,
-                      color: Colors.grey,
-                    ),
-                    title: const Text('Direct'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => Direct(
-                                currentUsername: username,
-                                usernames: widget.usernames)),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(
-                      Icons.favorite,
-                      color: Colors.grey,
-                    ),
-                    title: const Text('Liked posts'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LikedPosts(
-                                  likedPosts: widget.likedPosts,
-                                )),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(
-                      Icons.bookmark_outlined,
-                      color: Colors.grey,
-                    ),
-                    title: const Text('Saved posts'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => SavedPosts(
-                                  savedPosts: widget.savedPosts,
-                                )),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(
-                      Icons.settings,
-                      color: Colors.grey,
-                    ),
-                    title: const Text('Settings'),
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(
-                      Icons.logout,
-                      color: Colors.grey,
-                    ),
-                    title: const Text('Sign Out'),
-                    onTap: () async {
-                      await AuthMethods().signOut();
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) => const Login(),
+            endDrawer: widget.userId == FirebaseAuth.instance.currentUser!.uid
+                ? Drawer(
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      children: [
+                        const DrawerHeader(
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                          ),
+                          child: Text(
+                            'Profile Menu',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
-                      );
-                    },
+                        ListTile(
+                          leading: const Icon(
+                            Icons.messenger_outline_sharp,
+                            color: Colors.grey,
+                          ),
+                          title: const Text('Direct'),
+                          onTap: () {
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //       builder: (context) => Direct(
+                            //           currentUsername: username,
+                            //           usernames: widget.usernames)),
+                            // );
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(
+                            Icons.favorite,
+                            color: Colors.grey,
+                          ),
+                          title: const Text('Liked posts'),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    Consumer<PostsModel>(
+                                      builder: (context, postsModel, child){
+                                        Provider.of<PostsModel>(context)
+                                        .fetchLikedPosts
+                                        (FirebaseAuth.instance.currentUser!.uid);
+                                        return LikedPosts(
+                                          likedPosts: postsModel.likedPosts,
+                                        );
+                                      }
+                                ),
+                              ),
+                            );
+                          },
+                          
+                        ),
+                        ListTile(
+                          leading: const Icon(
+                            Icons.bookmark_outlined,
+                            color: Colors.grey,
+                          ),
+                          title: const Text('Saved posts'),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Consumer<PostsModel>(
+                                    builder: (context, postsModel, child) {
+                                  Provider.of<PostsModel>(context)
+                                      .fetchSavedPosts(FirebaseAuth
+                                          .instance.currentUser!.uid);
+                                  return SavedPosts(
+                                    savedPosts: postsModel.savedPosts,
+                                  );
+                                }),
+                              ),
+                            );
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(
+                            Icons.settings,
+                            color: Colors.grey,
+                          ),
+                          title: const Text('Settings'),
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          leading: const Icon(
+                            Icons.logout,
+                            color: Colors.grey,
+                          ),
+                          title: const Text('Sign Out'),
+                          onTap: () async {
+                            await AuthMethods().signOut();
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                builder: (context) => const Login(),
+                              ),
+                            );
+                          },
+                        )
+                      ],
+                    ),
                   )
-                ],
-              ),
-            ),
-            body: Column(children: [
+                : const SizedBox(),
+            body: 
+              Consumer<PostsModel>(
+              builder: (context, postsModel, child) {
+                // if (postsModel.posts.isEmpty) {
+                //   return Center(
+                //     // child: CircularProgressIndicator(),
+                //     child: Text('No posts yet', style: TextStyle(color: Colors.grey[600]),),
+                //   );
+                // }
+                
+
+                return Column(children: [
               Padding(
                 padding: const EdgeInsets.only(left: 15, right: 15),
                 child: Row(
@@ -206,15 +264,17 @@ class _Account extends State<Account> {
                     Container(
                       width: 80,
                       height: 80,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.grey,
+                        image: DecorationImage(
+                          image: NetworkImage(user.profilePic),
+                        ),
                       ),
                     ),
                     Column(
                       children: [
                         Text(
-                          '${widget.posts.length}',
+                          '${postsModel.posts.length}',
                           style: const TextStyle(
                               fontWeight: FontWeight.bold, color: Colors.black),
                         ),
@@ -228,7 +288,7 @@ class _Account extends State<Account> {
                     Column(
                       children: [
                         Text(
-                          '${followers.length}',
+                          '${user.followers.length}',
                           style: const TextStyle(
                               fontWeight: FontWeight.bold, color: Colors.black),
                         ),
@@ -242,7 +302,7 @@ class _Account extends State<Account> {
                     Column(
                       children: [
                         Text(
-                          '${following.length}',
+                          '${user.following.length}',
                           style: const TextStyle(
                               fontWeight: FontWeight.bold, color: Colors.black),
                         ),
@@ -261,17 +321,59 @@ class _Account extends State<Account> {
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
+                      widget.userId == FirebaseAuth.instance.currentUser!.uid
+                          ? ElevatedButton(
+                              onPressed: () {},
+                              style: elevatedButtonStyle,
+                              child: const Padding(
+                                padding: EdgeInsets.only(left: 5, right: 5),
+                                child: Text('Edit profile',
+                                    style: TextStyle(color: Colors.black)),
+                              ),
+                            )
+                          : user.followers.contains(FirebaseAuth.instance.currentUser!.uid)
+                              ? ElevatedButton(
+                                  style: elevatedButtonStyle,
+                                  child: const Padding(
+                                    padding: EdgeInsets.only(left: 5, right: 5),
+                                    child: Text('Unfollow',
+                                        style: TextStyle(color: Colors.black)),
+                                  ),
+                                  onPressed: () async {
+                                    await UserModel().followUser(
+                                      FirebaseAuth.instance.currentUser!.uid,
+                                      user.uid
+                                    );
+
+                                    setState(() {
+                                      isFollowing = false;
+                                      followers--;
+                                    });
+                                  },
+                                )
+                              : ElevatedButton(
+                                  style: blueButtonsStyle,
+                                  child: const Padding(
+                                    padding: EdgeInsets.only(left: 5, right: 5),
+                                    child: Text('Follow',
+                                        style: TextStyle(
+                                            color: Color.fromARGB(
+                                                255, 255, 255, 255))),
+                                  ),
+                                  onPressed: () async {
+                                    await UserModel().followUser(
+                                      FirebaseAuth.instance.currentUser!.uid,
+                                      user.uid,
+                                    );
+
+                                    setState(() {
+                                      isFollowing = true;
+                                      followers++;
+                                    });
+                                  },
+                                ),
                       ElevatedButton(
-                        onPressed: null,
-                        style: elevatedButtonStyle,
-                        child: const Padding(
-                          padding: EdgeInsets.only(left: 5, right: 5),
-                          child: Text('Edit profile',
-                              style: TextStyle(color: Colors.black)),
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: null,
+                        onPressed: () {},
                         style: elevatedButtonStyle,
                         child: const Padding(
                           padding: EdgeInsets.only(left: 5, right: 5),
@@ -280,7 +382,7 @@ class _Account extends State<Account> {
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: null,
+                        onPressed: () {},
                         style: elevatedButtonStyle,
                         child: const Padding(
                           padding: EdgeInsets.only(left: 5, right: 5),
@@ -297,42 +399,74 @@ class _Account extends State<Account> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: Container(
-                        width: 60,
-                        height: 60,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.grey,
+                    StreamBuilder<List<StoryCollection>>(
+                      stream: StoryCollectionModel().fetchCollections(user.uid),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return CircularProgressIndicator();
+                        }
+                        List<StoryCollection> collections = snapshot.data!;
+
+                        return Expanded(
+                          child: Container(
+                          height: 90,
+                          padding: const EdgeInsets.only(
+                              left: 10.0, right: 10.0),
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: collections.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                        CollectionViewer(collection: collections[index]),
+                                    ),
+                                  );
+                                },
+                                child: StoryCollectionCircle(collection: collections[index],),
+                              );
+                            },
+                          ),
                         ),
-                      ),
+                        );
+                      },
                     ),
-                    Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: Column(
-                          children: [
-                            Container(
-                              width: 60,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Colors.transparent,
-                                border:
-                                    Border.all(color: Colors.black54, width: 1),
-                              ),
-                              child: const SizedBox(
-                                width: 40,
-                                height: 40,
-                                child: Icon(Icons.add),
-                              ),
-                            ),
-                            const Text(
-                              'Create',
-                              style: TextStyle(color: Colors.black),
-                            )
-                          ],
-                        )),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(right: 10),
+                    //   child: ListView.builder(
+
+                    //   ),
+                    // ),
+
+                    // Padding(
+                    //     padding: const EdgeInsets.only(right: 10),
+                    //     child: Column(
+                    //       children: [
+                    //         Container(
+                    //           width: 60,
+                    //           height: 60,
+                    //           decoration: BoxDecoration(
+                    //             shape: BoxShape.circle,
+                    //             color: Colors.transparent,
+                    //             border:
+                    //                 Border.all(color: Colors.black54, width: 1),
+                    //           ),
+                    //           child: const SizedBox(
+                    //             width: 40,
+                    //             height: 40,
+                    //             child: Icon(Icons.add),
+                    //           ),
+                    //         ),
+                    //         const Text(
+                    //           'Create',
+                    //           style: TextStyle(color: Colors.black),
+                    //         )
+                    //       ],
+                    //     )
+                    //   ),
                   ],
                 ),
               ),
@@ -379,71 +513,82 @@ class _Account extends State<Account> {
                   ),
                 ],
               ),
+              postsModel.posts.isEmpty
+                ? Expanded(
+                    child: Center(
+                      child: Text(
+                        'No posts yet',
+                        style: TextStyle(color: Colors.grey[600]),
+                      ),
+                    )
+                  )
+                :
               Expanded(
                 child: GridView.count(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 2,
-                    mainAxisSpacing: 2,
-                    children: _isTapped
-                        ? List.generate(widget.mentionedPosts.length, (index) {
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => PostsViewer(
-                                          index, widget.mentionedPosts)),
-                                );
-                              },
-                              child: Hero(
-                                tag: 'post${widget.mentionedPosts[index].id}',
-                                child: Material(
-                                  type: MaterialType.transparency,
-                                  child: PostPreview(
-                                      id: widget.mentionedPosts[index].id,
-                                      post: widget.mentionedPosts[index]),
-                                ),
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 2,
+                  mainAxisSpacing: 2,
+                  children:
+                  
+                      // _isTapped
+                      //     ? List.generate(widget.mentionedPosts.length, (index) {
+                      //         return GestureDetector(
+                      //           onTap: () {
+                      //             Navigator.push(
+                      //               context,
+                      //               MaterialPageRoute(
+                      //                   builder: (context) => PostsViewer(
+                      //                       index, widget.mentionedPosts)),
+                      //             );
+                      //           },
+                      //           child: Hero(
+                      //             tag: 'post${widget.mentionedPosts[index].id}',
+                      //             child: Material(
+                      //               type: MaterialType.transparency,
+                      //               child: PostPreview(
+                      //                   id: widget.mentionedPosts[index].id,
+                      //                   post: widget.mentionedPosts[index]),
+                      //             ),
+                      //           ),
+                      //         );
+                      //       })
+                      //     :
+                      List.generate(
+                    postsModel.posts.length,
+                    (index) {
+                      // index += 17;
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  // PostsViewer(index, posts)
+                                  Consumer<PostsModel>(
+                                builder: (context, postsModel, child) =>
+                                    PostsViewer(index, postsModel.posts),
                               ),
-                            );
-                          })
-                        : List.generate(widget.posts.length, (index) {
-                            // index += 17;
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          PostsViewer(index, widget.posts)),
-                                );
-                              },
-                              child: Hero(
-                                tag: 'post${widget.posts[index].id}',
-                                child: Material(
-                                  type: MaterialType.transparency,
-                                  child: PostPreview(
-                                      id: widget.posts[index].id,
-                                      post: widget.posts[index]),
-                                ),
-                              ),
-                            );
-                          })),
+                            ),
+                          );
+                        },
+                        child: Hero(
+                          tag: 'post${postsModel.posts[index].postId}',
+                          child: Material(
+                            type: MaterialType.transparency,
+                            child: PostPreview(post: postsModel.posts[index]),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
-            ]),
-            floatingActionButton: FloatingActionButton(
-              backgroundColor: Colors.white,
-              elevation: 0,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => Direct(
-                          currentUsername: username,
-                          usernames: widget.usernames)),
-                );
+            ]
+            );
               },
-              child: const Icon(Icons.message, color: Colors.black),
+              child: SizedBox(),
             ),
+            
           );
   }
 }

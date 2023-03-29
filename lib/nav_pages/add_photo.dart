@@ -3,11 +3,14 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:social_network/storage/storage_connection.dart';
+// import 'package:social_network/storage/storage_connection.dart';
 import 'package:social_network/pick_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:social_network/errors_display/snackbar.dart';
+import 'package:social_network/models/posts_model.dart';
+import 'package:provider/provider.dart';
+import 'package:social_network/models/user_model.dart';
 
 class AddPhoto extends StatefulWidget {
   const AddPhoto({super.key});
@@ -72,7 +75,7 @@ class _AddPhotoState extends State<AddPhoto> {
       _loading = true;
     });
     try {
-      String res = await FireStoreMethods().uploadPost(
+      String res = await PostsModel().uploadPost(
         _imageFile!,
         uid,
         username,
@@ -102,32 +105,34 @@ class _AddPhotoState extends State<AddPhoto> {
     }
   }
 
-  // late DocumentSnapshot snap;
-  late String username;
-  late String photoUrl;
-  String uid = FirebaseAuth.instance.currentUser!.uid;
+  // // late DocumentSnapshot snap;
+  // late String username;
+  // late String photoUrl;
+  // String uid = FirebaseAuth.instance.currentUser!.uid;
 
-  @override
-  void initState() {
-    super.initState();
-    getUserData();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   getUserData();
+  // }
 
-  void getUserData() async {
-    DocumentSnapshot snap =
-        await FirebaseFirestore.instance.collection('users').doc(uid).get();
+  // void getUserData() async {
+  //   DocumentSnapshot snap =
+  //       await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
-    setState(() {
-      username = (snap.data() as Map<String, dynamic>)['username'];
-      print(username);
-      photoUrl = (snap.data() as Map<String, dynamic>)['photoUrl'];
-      print(photoUrl);
-    });
-  }
+  //   setState(() {
+  //     username = (snap.data() as Map<String, dynamic>)['username'];
+  //     // print(username);
+  //     photoUrl = (snap.data() as Map<String, dynamic>)['photoUrl'];
+  //     // print(photoUrl);
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
     // final UserModel.User user = Provider.of<UserProvider>(context).getUser;
+    final user = Provider.of<UserModel>(context, listen: false);
+    user.fetchUser();
 
     return _imageFile == null
         ? Center(
@@ -151,9 +156,9 @@ class _AddPhotoState extends State<AddPhoto> {
                 TextButton(
                   onPressed: () {
                     postImage(
-                      uid,
-                      username,
-                      photoUrl,
+                      user.uid,
+                      user.username,
+                      user.profilePic,
                     );
                   },
                   child: Text(
@@ -190,7 +195,7 @@ class _AddPhotoState extends State<AddPhoto> {
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
                                 image: DecorationImage(
-                                  image: NetworkImage(photoUrl),
+                                  image: NetworkImage(user.profilePic),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -199,7 +204,7 @@ class _AddPhotoState extends State<AddPhoto> {
                               width: 15,
                             ),
                             Text(
-                              username,
+                              user.username,
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ],

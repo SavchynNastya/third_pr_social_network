@@ -4,6 +4,7 @@ class Post {
   final String uid;
   final String username;
   final List likes;
+  final List savings;
   final String postId;
   final DateTime datePublished;
   final String postUrl;
@@ -13,6 +14,7 @@ class Post {
     required this.uid,
     required this.username,
     required this.likes,
+    required this.savings,
     required this.postId,
     required this.datePublished,
     required this.postUrl,
@@ -24,24 +26,27 @@ class Post {
     var snapshot = snap.data() as Map<String, dynamic>;
 
     return Post(
-        uid: snapshot["uid"],
-        likes: snapshot["likes"],
-        postId: snapshot["postId"],
-        datePublished: snapshot["datePublished"],
-        username: snapshot["username"],
-        postUrl: snapshot['postUrl'],
-        profImage: snapshot['profImage'],
-        desc: snapshot['desc']);
+      uid: snapshot["uid"],
+      likes: snapshot["likes"],
+      savings: snapshot["savings"],
+      postId: snapshot["postId"],
+      datePublished: snapshot["datePublished"].toDate(),
+      username: snapshot["username"],
+      postUrl: snapshot['postUrl'],
+      profImage: snapshot['profImage'],
+      desc: snapshot['desc']
+    );
   }
 
   Map<String, dynamic> toJson() => {
-        "uid": uid,
-        "likes": likes,
-        "username": username,
-        "postId": postId,
-        "datePublished": datePublished,
-        'postUrl': postUrl,
-        'profImage': profImage,
-        'desc': desc,
-      };
+    "uid": uid,
+    "likes": likes,
+    "savings": savings,
+    "username": username,
+    "postId": postId,
+    "datePublished": datePublished,
+    'postUrl': postUrl,
+    'profImage': profImage,
+    'desc': desc,
+  };
 }

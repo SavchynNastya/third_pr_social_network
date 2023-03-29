@@ -25,4 +25,5 @@ class StorageMethods {
     String downloadUrl = await snapshot.ref.getDownloadURL();
     return downloadUrl;
   }
+
 }

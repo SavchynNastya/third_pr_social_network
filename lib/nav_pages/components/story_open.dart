@@ -1,58 +1,302 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: prefer_const_constructors
 
-class StoryOpen extends StatelessWidget {
-  final String username;
-  const StoryOpen({super.key, required this.username});
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:social_network/errors_display/snackbar.dart';
+import 'package:social_network/models/story.dart';
+import 'package:social_network/models/story_model.dart';
+import 'package:social_network/models/story_collection_model.dart';
+import 'package:social_network/models/story_collection.dart';
+
+class StoryOpen extends StatefulWidget {
+  final Story story;
+  const StoryOpen({super.key, required this.story});
+
+  @override
+  State<StoryOpen> createState() => _StoryOpenState();
+
+}
+
+class _StoryOpenState extends State<StoryOpen>{
+  late bool _loading;
+
+  final collectionNameController = TextEditingController();
+
+  void addCollection(String uid, String storyId) async {
+    setState(() {
+      _loading = true;
+    });
+    try {
+      String res = await StoryCollectionModel().createStoryCollection(
+        uid, collectionNameController.text, storyId);
+      if (res == "success") {
+        setState(() {
+          _loading = false;
+        });
+        showSnackBar(
+          context,
+          'Created!',
+        );
+      } else {
+        showSnackBar(context, res);
+      }
+    } catch (err) {
+      setState(() {
+        _loading = false;
+      });
+      showSnackBar(
+        context,
+        err.toString(),
+      );
+    }
+  }
+
+  void showCollections(BuildContext parentContext) async{
+    return showDialog(
+      context: parentContext,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('Choose a collection'),
+          children: <Widget>[
+            Row(
+              children: [
+                StreamBuilder<List<StoryCollection>>(
+                  stream: StoryCollectionModel().fetchCollections(FirebaseAuth.instance.currentUser!.uid),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<StoryCollection>> snapshot) {
+                        print(snapshot);
+                    if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else if (!snapshot.hasData) {
+                      return Text('Loading...');
+                    } else {
+                      List<StoryCollection> collections = snapshot.data!;
+                      return Column(
+                        children: collections
+                            .map((collection) => TextButton(
+                                  onPressed: () {
+                                    StoryCollectionModel().addStoryToCollection(
+                                      collection.storyCollectionId, 
+                                      widget.story.storyId
+                                    );
+                                  },
+                                  child: Text(collection.storyCollectionName),
+                                ))
+                            .toList(),
+                      );
+                    }
+                  },
+                ),
+              ],
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  void createCollection(BuildContext parentContext) async {
+    return showDialog(
+      context: parentContext,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: const Text('Create a Collection'),
+          children: <Widget>[
+            TextField(
+              autofocus: false,
+              controller: collectionNameController,
+              textAlign: TextAlign.start,
+            ),
+            Row(
+              children: [
+                SimpleDialogOption(
+                  padding: const EdgeInsets.all(20),
+                  child: const Text("Cancel"),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                SimpleDialogOption(
+                  padding: const EdgeInsets.all(20),
+                  child: const Text("Create"),
+                  onPressed: () {
+                    addCollection(
+                      FirebaseAuth.instance.currentUser!.uid,
+                      widget.story.storyId
+                    );
+                    Navigator.pop(context);
+                  },
+                )
+              ],
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  void deleteStory(String storyId) async {
+    setState(() {
+      _loading = true;
+    });
+    try {
+      String res = await StoriesModel().deleteStory(storyId);
+      if (res == "success") {
+        setState(() {
+          _loading = false;
+        });
+        showSnackBar(
+          context,
+          'Story has been successfully deleted.',
+        );
+      } else {
+        showSnackBar(context, res);
+      }
+    } catch (err) {
+      setState(() {
+        _loading = false;
+      });
+      showSnackBar(
+        context,
+        err.toString(),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     return Scaffold(
-      body: Container(
-        width: screenSize.width,
-        height: screenSize.height,
-        color: Colors.grey[400],
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 10, top: 30, right: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Stack(
+      children: [
+        Container(
+          width: screenSize.width,
+          height: screenSize.height,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: NetworkImage(widget.story.storyPic),
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        Positioned(
+          top: 35,
+          left: 8,
+          right: 8,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
                 children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Color.fromARGB(255, 124, 124, 124),
-                        ),
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: NetworkImage(widget.story.profilePic)
                       ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 20),
-                        child: Text(
-                          username,
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              decoration: TextDecoration.none),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                  const Icon(Icons.more_vert, color: Colors.white),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20),
+                    child: Text(
+                      widget.story.username,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          decoration: TextDecoration.none),
+                    ),
+                  ),
                 ],
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(10),
+              widget.story.uid == FirebaseAuth.instance.currentUser!.uid ?
+              Row(
+                children: [
+                  IconButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return SimpleDialog(
+                        title: const Text('Delete a story?'),
+                        children: <Widget>[
+                          SimpleDialogOption(
+                              padding: const EdgeInsets.all(20),
+                              child: const Text('Yes'),
+                              onPressed: () async {
+                                Navigator.pop(context);
+                                deleteStory(widget.story.storyId);
+                              }),
+                          SimpleDialogOption(
+                            padding: const EdgeInsets.all(20),
+                            child: const Text("Cancel"),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          )
+                        ],
+                      );
+                    },
+                  );
+                },
+                icon: Icon(Icons.disabled_by_default_outlined, color: Colors.white),
+              ) ,
+              
+              IconButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return SimpleDialog(
+                        title: const Text('Add to collection'),
+                        children: <Widget>[
+                          SimpleDialogOption(
+                              padding: const EdgeInsets.all(20),
+                              child: const Text('Create new'),
+                              onPressed: () {
+                                Navigator.pop(context);
+                                createCollection(context);
+                                
+                              },
+                          ),
+                          SimpleDialogOption(
+                            padding: const EdgeInsets.all(20),
+                            child: const Text("Show collections"),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              showCollections(context);
+                            },
+                          ),
+                          SimpleDialogOption(
+                            padding: const EdgeInsets.all(20),
+                            child: const Text("Cancel"),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          )
+                        ],
+                      );
+                    },
+                  );
+                },
+                icon: Icon(Icons.add_circle_outline, color: Colors.white),
+              ) ,
+                ],
+              ) :
+              SizedBox(),
+            ],
+          ),
+        ),
+        Positioned(
+          bottom: 8,
+          left: 8,
+          right: 8,
+          child: Container(
               child:  Row(
                 children: [
                   SizedBox(
@@ -86,12 +330,11 @@ class StoryOpen extends StatelessWidget {
                     ],
                   )
                 ],
-              ),
             ),
-          ],
+          ),
         ),
+      ],
       ),
     );
-    
   }
 }

@@ -1,10 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class Story extends StatelessWidget {
+class StoryCircle extends StatelessWidget {
 
   final String username;
+  final String userId;
+  final String profilePic;
 
-  const Story({super.key, required this.username});
+  const StoryCircle({super.key, required this.username, required this.userId,
+    required this.profilePic});
 
   @override
   Widget build(BuildContext context) {
@@ -27,16 +31,18 @@ class Story extends StatelessWidget {
             width: 55,
             height: 55,
             alignment: Alignment.center,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.grey,
+              image: DecorationImage(
+                image: NetworkImage(profilePic)
+              )
             ),
           ),
         ),
         const SizedBox(
           height: 10,
         ),
-        Text(username),
+        Text(FirebaseAuth.instance.currentUser!.uid == userId ? "My story" : username),
       ],),
     );
   }

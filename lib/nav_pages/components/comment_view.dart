@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:social_network/nav_pages/components/comment.dart';
+import 'package:social_network/models/comment.dart';
 
 class CommentView extends StatelessWidget {
   final Comment comment;
@@ -19,8 +19,8 @@ class CommentView extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 10, right: 15),
                 child: Container(
-                  width: 50,
-                  height: 50,
+                  width: 35,
+                  height: 35,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
@@ -31,12 +31,15 @@ class CommentView extends StatelessWidget {
                     ),
                   ),
                   child: Container(
-                    width: 45,
-                    height: 45,
+                    width: 30,
+                    height: 30,
                     alignment: Alignment.center,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.grey,
+                      image: DecorationImage(
+                        image: NetworkImage(comment.profilePic),
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),

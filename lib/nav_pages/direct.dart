@@ -1,10 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:social_network/nav_pages/components/dialog.dart';
+import 'package:social_network/models/user.dart' as UserStructure;
+import 'package:social_network/models/user_model.dart';
 
-class Direct extends StatelessWidget {
-  final String currentUsername;
+class Direct extends StatefulWidget {
+  // final String currentUsername;
   final List usernames;
-  const Direct({super.key, required this.currentUsername, required this.usernames});
+  Direct({super.key, required this.usernames});
+
+  @override
+  State<Direct> createState() => _DirectState();
+
+}
+
+class _DirectState extends State<Direct>{
+  UserStructure.User? user;
+
+  @override
+  void initState() async{
+    super.initState();
+    user = await UserModel().getUserData();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +35,7 @@ class Direct extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween, 
             children: [
-              Text(currentUsername, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+              Text(user!.username, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
               Row(
                 children: const [
                   Padding(
@@ -74,10 +90,10 @@ class Direct extends StatelessWidget {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: usernames.length,
+                itemCount: widget.usernames.length,
                 itemBuilder: (context, index) {
                   return NewDialog(
-                    username: usernames[index],
+                    username: widget.usernames[index],
                   );
                 }
               ),
