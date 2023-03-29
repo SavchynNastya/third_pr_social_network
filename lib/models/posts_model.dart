@@ -5,7 +5,6 @@ import 'package:social_network/models/comment.dart';
 import 'dart:typed_data';
 import 'package:social_network/storage/storage.dart';
 import 'package:uuid/uuid.dart';
-import 'package:social_network/errors_display/snackbar.dart';
 
 class PostsModel extends ChangeNotifier {
 
@@ -31,7 +30,6 @@ class PostsModel extends ChangeNotifier {
         .get();
     final posts = postsSnapshot.docs.map((doc) => Post.fromSnap(doc)).toList();
     _posts = posts;
-    // print("POSTS $_posts");
     notifyListeners();
   }
 
@@ -44,7 +42,6 @@ class PostsModel extends ChangeNotifier {
     final posts =
         postsSnapshot.docs.map((doc) => Post.fromSnap(doc)).toList();
     _posts = posts;
-    // print("POSTS $_posts");
     notifyListeners();
   }
 
@@ -66,19 +63,6 @@ class PostsModel extends ChangeNotifier {
         likedPostSnap.docs.map((doc) => Post.fromSnap(doc)).toList();
     _likedPosts = likedPosts;
   }
-
-  // Future<void> fetchPostComments(String postId) async {
-  //   final commentsSnapshot = await FirebaseFirestore.instance
-  //       .collection('posts')
-  //       .doc(postId)
-  //       .collection('comments')
-  //       // .orderBy('timestamp', descending: true)
-  //       .get();
-  //   final comments = commentsSnapshot.docs.map((doc) => Comment.fromSnap(doc)).toList();
-  //   _comments = comments;
-  //   print("COMMENTS $_comments");
-  //   notifyListeners();
-  // }
 
   Stream<List<Comment>> fetchPostComments(String postId) {
     return FirebaseFirestore.instance

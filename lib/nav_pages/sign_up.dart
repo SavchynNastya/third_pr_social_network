@@ -1,4 +1,3 @@
-// ignore_for_file: sort_child_properties_last, prefer_const_constructors
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:social_network/homepage.dart';
@@ -59,7 +58,7 @@ class _SignUpState extends State<SignUp> {
       });
 
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => const HomePage()),
       );
     } else {
       setState(() {
@@ -80,8 +79,8 @@ class _SignUpState extends State<SignUp> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Flexible(
-              child: Container(),
               flex: 2,
+              child: Container(),
             ),
             const Text(
               'Instagram',
@@ -97,7 +96,7 @@ class _SignUpState extends State<SignUp> {
                     ? Container(
                         width: 120,
                         height: 120,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(
                                 image: AssetImage('images/user_photo.jpg'))),
@@ -152,7 +151,17 @@ class _SignUpState extends State<SignUp> {
               height: 15,
             ),
             InkWell(
+              onTap: signUp,
               child: Container(
+                width: double.infinity,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: ShapeDecoration(
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(4)),
+                  ),
+                  color: Colors.blue.shade500,
+                ),
                 child: !_loading
                     ? const Text(
                         'Sign Up',
@@ -161,35 +170,25 @@ class _SignUpState extends State<SignUp> {
                             fontWeight: FontWeight.bold,
                             fontSize: 18),
                       )
-                    : CircularProgressIndicator(
+                    : const CircularProgressIndicator(
                         color: Color.fromARGB(255, 255, 255, 255),
                       ),
-                width: double.infinity,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: ShapeDecoration(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(4)),
-                  ),
-                  color: Colors.blue.shade500,
-                ),
               ),
-              onTap: signUp,
             ),
             Flexible(
-              child: Container(),
               flex: 2,
+              child: Container(),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Padding(
+                const Padding(
                   padding: EdgeInsets.all(8),
                   child: Text("Already have an account?"),
                 ),
                 GestureDetector(
                   onTap: () => Navigator.of(context).pop(),
-                  child: Padding(
+                  child: const Padding(
                     padding: EdgeInsets.symmetric(vertical: 8),
                     child: Text(
                       "Log in",

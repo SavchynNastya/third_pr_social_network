@@ -5,34 +5,11 @@ import 'package:social_network/models/comment.dart';
 import 'dart:typed_data';
 import 'package:social_network/storage/storage.dart';
 import 'package:uuid/uuid.dart';
-import 'package:social_network/errors_display/snackbar.dart';
 
 class ReelsModel extends ChangeNotifier {
 
-  // List<Reels> _reels = [];
-  // List<Comment> _comments = [];
-
-  // List<Post> _savedPosts = [];
-  // List<Post> _likedPosts = [];
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  // List<Post> get posts => _posts;
-  // List<Comment> get comments => _comments;
-
-  // List<Post> get savedPosts => _savedPosts;
-  // List<Post> get likedPosts => _likedPosts;
-
-  // Future<void> fetchFeedPosts(String userId) async {
-  //   final postsSnapshot = await FirebaseFirestore.instance
-  //       .collection('posts')
-  //       .where('uid', isNotEqualTo: userId)
-  //       .orderBy('datePublished', descending: true)
-  //       .get();
-  //   final posts = postsSnapshot.docs.map((doc) => Post.fromSnap(doc)).toList();
-  //   _posts = posts;
-  //   notifyListeners();
-  // }
 
   Stream<List<ReelItem>> fetchReels() {
     return FirebaseFirestore.instance

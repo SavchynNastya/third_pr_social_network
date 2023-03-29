@@ -15,13 +15,7 @@ import 'package:social_network/models/story_model.dart';
 import 'package:social_network/models/story.dart';
 
 class Feeds extends StatelessWidget {
-  Feeds({super.key}) {
-    // storiesAvailable = List.generate(
-    //     usernames.length, (index) => Story(username: usernames[index]));
-  }
-
-  // final List usernames;
-  // static late List storiesAvailable;
+  Feeds({super.key}) ;
   
 
   @override

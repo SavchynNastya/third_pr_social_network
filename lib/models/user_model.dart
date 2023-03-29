@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,49 +7,17 @@ import 'package:flutter/material.dart';
 
 
 class UserModel extends ChangeNotifier {
-  // late UserStructure.User user;
-
-  // void getUserData() async {
-  //   DocumentSnapshot userSnap = await FirebaseFirestore.instance
-  //       .collection('users')
-  //       .doc(FirebaseAuth.instance.currentUser!.uid)
-  //       .get();
-
-  //   user = UserStructure.User.fromSnap(userSnap);
-  //   print("USER $user");
-  // }
-
-  // Future<UserStructure.User?> getUserData() async {
-    // DocumentSnapshot userSnap = await FirebaseFirestore.instance
-    //     .collection('users')
-    //     .doc(FirebaseAuth.instance.currentUser!.uid)
-    //     .get();
-
-  //   user = UserStructure.User.fromSnap(userSnap);
-  //   print("USER $user");
-  //   return user;
-  // }
-
-  // UserStructure.User? _user;
-
-  // UserStructure.User? get user => _user;
-  late String uid;
+  late String uid = '';
   late String username;
   late String email;
   late List followers;
   late List following;
   late String profilePic;
 
-  late String lastLikedUsername;
+  late String lastLikedUsername = '';
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // late String accountUid;
-  // late String accountUsername;
-  // late String accountEmail;
-  // late List accountFollowers;
-  // late List accountFollowing;
-  // late String accountProfilePic;
 
   Future<void> fetchUser() async {
     DocumentSnapshot userSnap = await FirebaseFirestore.instance

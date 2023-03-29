@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_network/nav_pages/components/dialog.dart';
 import 'package:social_network/models/user.dart' as UserStructure;
-import 'package:social_network/models/user_model.dart';
 
 class Direct extends StatefulWidget {
   // final String currentUsername;
@@ -16,11 +15,11 @@ class Direct extends StatefulWidget {
 class _DirectState extends State<Direct>{
   UserStructure.User? user;
 
-  @override
-  void initState() async{
-    super.initState();
-    user = await UserModel().getUserData();
-  }
+  // @override
+  // void initState() async{
+  //   super.initState();
+  //   user = await UserModel().getUserData();
+  // }
 
   @override
   Widget build(BuildContext context) {

@@ -1,12 +1,9 @@
-// ignore_for_file: prefer_const_constructors, library_private_types_in_public_api, use_build_context_synchronously
 
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 // import 'package:social_network/storage/storage_connection.dart';
 import 'package:social_network/pick_image.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:social_network/errors_display/snackbar.dart';
 import 'package:social_network/models/posts_model.dart';
 import 'package:provider/provider.dart';
@@ -105,39 +102,15 @@ class _AddPhotoState extends State<AddPhoto> {
     }
   }
 
-  // // late DocumentSnapshot snap;
-  // late String username;
-  // late String photoUrl;
-  // String uid = FirebaseAuth.instance.currentUser!.uid;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   getUserData();
-  // }
-
-  // void getUserData() async {
-  //   DocumentSnapshot snap =
-  //       await FirebaseFirestore.instance.collection('users').doc(uid).get();
-
-  //   setState(() {
-  //     username = (snap.data() as Map<String, dynamic>)['username'];
-  //     // print(username);
-  //     photoUrl = (snap.data() as Map<String, dynamic>)['photoUrl'];
-  //     // print(photoUrl);
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
-    // final UserModel.User user = Provider.of<UserProvider>(context).getUser;
     final user = Provider.of<UserModel>(context, listen: false);
     user.fetchUser();
 
     return _imageFile == null
         ? Center(
             child: IconButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.add_a_photo_outlined,
               ),
               onPressed: () => _selectImage(context),
@@ -180,13 +153,13 @@ class _AddPhotoState extends State<AddPhoto> {
                       ),
                 const Divider(),
                 Padding(
-                  padding: EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 0),
+                        padding: const EdgeInsets.symmetric(horizontal: 0),
                         child: Row(
                           children: [
                             Container(
@@ -200,17 +173,17 @@ class _AddPhotoState extends State<AddPhoto> {
                                 ),
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 15,
                             ),
                             Text(
                               user.username,
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 20,
                       ),
                       SizedBox(

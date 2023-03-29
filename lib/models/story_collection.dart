@@ -2,11 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class StoryCollection {
   final String storyCollectionId;
-  final String storyCollectionName;
+  String storyCollectionName;
   final String uid;
-  final List storiesList;
+  List storiesList;
   final DateTime datePublished;
-  const StoryCollection({
+  StoryCollection({
     required this.storyCollectionId,
     required this.storyCollectionName,
     required this.uid,

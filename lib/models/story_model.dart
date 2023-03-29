@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:social_network/models/post.dart';
-import 'package:social_network/models/comment.dart';
 import 'dart:typed_data';
 import 'package:social_network/storage/storage.dart';
 import 'package:uuid/uuid.dart';
 import 'package:social_network/models/story.dart';
-import 'package:social_network/errors_display/snackbar.dart';
 import 'package:collection/collection.dart';
 
 class StoriesModel extends ChangeNotifier {

@@ -22,7 +22,7 @@ class CollectionViewer extends StatelessWidget {
       child: SizedBox(
         width: screenSize.width,
         height: screenSize.height,
-        child: ListView.builder(
+        child: PageView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: collection.storiesList.length,
           itemBuilder: (BuildContext context, int storyIndex) {
@@ -30,12 +30,11 @@ class CollectionViewer extends StatelessWidget {
             return SizedBox(
               height: screenSize.height,
               width: screenSize.width,
-              // child: StoryOpen(story: story),
               child: StreamBuilder<Story>(
                 stream: StoriesModel().getStoryStream(storyId),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
-                    return CircularProgressIndicator();
+                    return const CircularProgressIndicator();
                   }
                   final story = snapshot.data!;
                   return StoryOpen(story: story);

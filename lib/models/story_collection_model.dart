@@ -2,18 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:social_network/models/story.dart';
 import 'package:social_network/models/story_collection.dart';
-import 'dart:typed_data';
-import 'package:social_network/storage/storage.dart';
 import 'package:uuid/uuid.dart';
-import 'package:social_network/errors_display/snackbar.dart';
 
 class StoryCollectionModel extends ChangeNotifier {
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  // List<String> currentStoriesList = [];
 
   Stream<List<StoryCollection>> fetchCollections(String userId) {
     return FirebaseFirestore.instance
@@ -27,8 +21,56 @@ class StoryCollectionModel extends ChangeNotifier {
     });
   }
 
+  Stream<List<StoryCollection>> fetchCollectionsWhereStoryPresent(String userId, String storyId) {
+    return FirebaseFirestore.instance
+        .collection('story_collections')
+        .where('uid', isEqualTo: userId)
+        .where('storiesList', arrayContains: storyId)
+        .snapshots()
+        .map((querySnapshot) {
+      return querySnapshot.docs
+          .map((doc) => StoryCollection.fromSnap(doc))
+          .toList();
+    });
+  }
+
   Future<String> addStoryToCollection(
       String collectionId, String storyId) async {
+    String res = "Error";
+    try {
+      DocumentSnapshot collectionSnapshot = await _firestore
+        .collection('story_collections')
+        .doc(collectionId)
+        .get();
+
+      if (!collectionSnapshot.exists) {
+        res = "Collection does not exist";
+        return res;
+      }
+
+      final collection = StoryCollection.fromSnap(collectionSnapshot);
+      if(collection.storiesList.contains(storyId)){
+        res = "Story is already in list";
+        return res;
+      }
+
+      var currentStoriesList = StoryCollection.fromSnap(collectionSnapshot);
+      currentStoriesList.storiesList.add(storyId);
+
+      await _firestore
+          .collection('story_collections')
+          .doc(collectionId)
+          .update({'storiesList': currentStoriesList.storiesList});
+
+      res = "success";
+      notifyListeners();
+    } catch (err) {
+      res = err.toString();
+    }
+    return res;
+  }
+
+  Future<String> renameCollection(String collectionId, String newName) async {
     String res = "Error";
     try {
       DocumentSnapshot collectionSnapshot = await _firestore
@@ -41,14 +83,13 @@ class StoryCollectionModel extends ChangeNotifier {
         return res;
       }
 
-      var currentStoriesList = StoryCollection.fromSnap(collectionSnapshot);
-      currentStoriesList.storiesList.add(storyId);
-      // print(currentStoriesList.storiesList);
+      final collection = StoryCollection.fromSnap(collectionSnapshot);
+      collection.storyCollectionName = newName;
 
       await _firestore
           .collection('story_collections')
           .doc(collectionId)
-          .update({'storiesList': currentStoriesList.storiesList});
+          .update({'collectionName': collection.storyCollectionName});
 
       res = "success";
       notifyListeners();
@@ -85,7 +126,7 @@ class StoryCollectionModel extends ChangeNotifier {
   }
 
 
-  Future<String> removeStoryFromCollection(
+  Future<String> removeFromCollection(
     String collectionId, String storyId) async {
     String res = "Error";
     try {

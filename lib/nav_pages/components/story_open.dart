@@ -51,6 +51,64 @@ class _StoryOpenState extends State<StoryOpen>{
     }
   }
 
+  void addStoryToCollection(String collectionId, String storyId) async {
+    setState(() {
+      _loading = true;
+    });
+    try {
+      String res = await StoryCollectionModel()
+          .addStoryToCollection(collectionId, storyId);
+      if (res == "success") {
+        setState(() {
+          _loading = false;
+        });
+        showSnackBar(
+          context,
+          'Added!',
+        );
+      } else {
+        showSnackBar(context, res);
+      }
+    } catch (err) {
+      setState(() {
+        _loading = false;
+      });
+      showSnackBar(
+        context,
+        err.toString(),
+      );
+    }
+  }
+
+  void removeFromCollection(String collectionId, String storyId) async {
+    setState(() {
+      _loading = true;
+    });
+    try {
+      String res = await StoryCollectionModel()
+          .removeFromCollection(collectionId, storyId);
+      if (res == "success") {
+        setState(() {
+          _loading = false;
+        });
+        showSnackBar(
+          context,
+          'Removed!',
+        );
+      } else {
+        showSnackBar(context, res);
+      }
+    } catch (err) {
+      setState(() {
+        _loading = false;
+      });
+      showSnackBar(
+        context,
+        err.toString(),
+      );
+    }
+  }
+
   void showCollections(BuildContext parentContext) async{
     return showDialog(
       context: parentContext,
@@ -74,14 +132,13 @@ class _StoryOpenState extends State<StoryOpen>{
                       return Column(
                         children: collections
                             .map((collection) => TextButton(
-                                  onPressed: () {
-                                    StoryCollectionModel().addStoryToCollection(
-                                      collection.storyCollectionId, 
-                                      widget.story.storyId
-                                    );
-                                  },
-                                  child: Text(collection.storyCollectionName),
-                                ))
+                                onPressed: () {
+                                  addStoryToCollection(collection.storyCollectionId, widget.story.storyId);
+                                  Navigator.pop(context);
+                                },
+                                child: Text(collection.storyCollectionName),
+                              )
+                            )
                             .toList(),
                       );
                     }
@@ -102,12 +159,16 @@ class _StoryOpenState extends State<StoryOpen>{
         return SimpleDialog(
           title: const Text('Create a Collection'),
           children: <Widget>[
-            TextField(
-              autofocus: false,
-              controller: collectionNameController,
-              textAlign: TextAlign.start,
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: TextField(
+                autofocus: false,
+                controller: collectionNameController,
+                textAlign: TextAlign.start,
+              ),
             ),
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SimpleDialogOption(
                   padding: const EdgeInsets.all(20),
@@ -285,6 +346,47 @@ class _StoryOpenState extends State<StoryOpen>{
                   );
                 },
                 icon: Icon(Icons.add_circle_outline, color: Colors.white),
+              ) ,
+              IconButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return SimpleDialog(
+                        title: const Text('Delete from collection'),
+                        children: <Widget>[
+                          StreamBuilder<List<StoryCollection>>(
+                            stream: StoryCollectionModel().fetchCollectionsWhereStoryPresent(FirebaseAuth.instance.currentUser!.uid, widget.story.storyId),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<List<StoryCollection>> snapshot) {
+                                  print(snapshot);
+                              if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              } else if (!snapshot.hasData) {
+                                return Text('Loading...');
+                              } else {
+                                List<StoryCollection> collections = snapshot.data!;
+                                return Column(
+                                  children: collections
+                                      .map((collection) => TextButton(
+                                          onPressed: () {
+                                            removeFromCollection(collection.storyCollectionId, widget.story.storyId);
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text(collection.storyCollectionName),
+                                        )
+                                      )
+                                      .toList(),
+                                );
+                              }
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                icon: Icon(Icons.folder_delete_outlined, color: Colors.white),
               ) ,
                 ],
               ) :

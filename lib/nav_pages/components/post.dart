@@ -168,8 +168,6 @@ class _PostCard extends State<PostCard> {
                             Provider.of<PostsModel>(context, listen: false)
                                 .likePost(widget.post.postId, user.uid,
                                     widget.post.likes);
-
-                            // widget.updateLikedPosts?.call(widget.id);
                           });
                         },
                       ),
@@ -206,8 +204,6 @@ class _PostCard extends State<PostCard> {
                   setState(() {
                     Provider.of<PostsModel>(context, listen: false).savePost(
                         widget.post.postId, user.uid, widget.post.savings);
-                    // saved = !saved;
-                    // widget.updateSavedPosts?.call(widget.id);
                   });
                 },
               ),
