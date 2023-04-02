@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:social_network/models/posts_model.dart';
 import 'package:social_network/models/user_model.dart';
 import 'package:social_network/errors_display/snackbar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PostCard extends StatefulWidget {
   // final String username;
@@ -30,13 +31,16 @@ class PostCard extends StatefulWidget {
 
 class _PostCard extends State<PostCard> {
   late bool _loading;
+  late StreamSubscription<List<dynamic>> _commentsSubscription;
+
+  List comments = [];
 
   void deleteImage(String postId) async {
     setState(() {
       _loading = true;
     });
     try {
-      String res = await PostsModel().deletePost(
+      String res = await PostsCubit().deletePost(
         widget.post.postId
       );
       if (res == "success") {
@@ -62,11 +66,37 @@ class _PostCard extends State<PostCard> {
   }
 
   @override
+  void initState(){
+    super.initState();
+    _commentsSubscription = context
+        .read<PostsCubit>()
+        .fetchPostComments(widget.post.postId)
+        .listen((comments) {
+      setState(() {
+        this.comments = comments;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _commentsSubscription
+        .cancel(); 
+    super.dispose();
+  }
+
+  @override
+  void deactivate() {
+    _commentsSubscription.cancel();
+    super.deactivate();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserModel>(context, listen: false);
     user.fetchUser();
-    final postModel = Provider.of<PostsModel>(context, listen: false);
-    postModel.fetchPostComments(widget.post.postId);
+    // final postModel = Provider.of<PostsModel>(context, listen: false);
+    // postModel.fetchPostComments(widget.post.postId);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,7 +124,7 @@ class _PostCard extends State<PostCard> {
                     ),
                     Text(
                       widget.post.username,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ],
                 ),
@@ -165,15 +195,19 @@ class _PostCard extends State<PostCard> {
                             : Icon(Icons.favorite_outline),
                         onPressed: () {
                           setState(() {
-                            Provider.of<PostsModel>(context, listen: false)
-                                .likePost(widget.post.postId, user.uid,
-                                    widget.post.likes);
+                            // Provider.of<PostsModel>(context, listen: false)
+                            //     .likePost(widget.post.postId, user.uid,
+                            //         widget.post.likes);
+                            context.read<PostsCubit>().likePost(
+                              widget.post.postId,
+                              user.uid,
+                              widget.post.likes
+                            );
                           });
                         },
                       ),
                       Text(
-                        "${widget.post.likes.length}",
-                        style: const TextStyle(color: Colors.black),
+                        "${widget.post.likes.length}"
                       ),
                     ],
                   ),
@@ -202,7 +236,9 @@ class _PostCard extends State<PostCard> {
                 ),
                 onPressed: () {
                   setState(() {
-                    Provider.of<PostsModel>(context, listen: false).savePost(
+                    // Provider.of<PostsModel>(context, listen: false).savePost(
+                    //     widget.post.postId, user.uid, widget.post.savings);
+                    context.read<PostsCubit>().savePost(
                         widget.post.postId, user.uid, widget.post.savings);
                   });
                 },
@@ -258,7 +294,8 @@ class _PostCard extends State<PostCard> {
           padding: const EdgeInsets.symmetric(vertical: 10),
           child: ListView.builder(
             shrinkWrap: true,
-            itemCount: postModel.comments.length,
+            // itemCount: postModel.comments.length,
+            itemCount: comments.length,
             itemBuilder: (context, index) {
               return GestureDetector(
                 onTap: () {
@@ -269,7 +306,8 @@ class _PostCard extends State<PostCard> {
                     ),
                   );
                 },
-                child: Comment(comment: postModel.comments[index]),
+                // child: Comment(comment: postModel.comments[index]),
+                child: Comment(comment: comments[index]),
               );
             },
           ),

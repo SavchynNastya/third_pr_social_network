@@ -45,7 +45,7 @@ class _StoryCollectionCircleState extends State<StoryCollectionCircle>{
                 Flexible(
                   child: Text(
                     widget.collection.storyCollectionName,
-                    style: const TextStyle(fontSize: 12),
+                    style: Theme.of(context).textTheme.labelSmall,
                   ),
                 ),
               ],

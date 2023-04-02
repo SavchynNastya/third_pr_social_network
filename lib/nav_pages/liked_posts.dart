@@ -10,13 +10,10 @@ class LikedPosts extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(
-          color: Colors.black,
-        ),
+        iconTheme: Theme.of(context).iconTheme,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('Liked Posts', style: TextStyle( color: Colors.black, 
-                          fontWeight: FontWeight.bold)),
+        title: Text('Liked Posts', style: Theme.of(context).textTheme.headlineSmall),
       ),
       body: 
         Column(

@@ -6,6 +6,8 @@ import 'package:social_network/pick_image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:social_network/models/reel.dart';
 import 'package:social_network/models/reels_model.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 
 class Reels extends StatefulWidget{
@@ -19,6 +21,36 @@ class Reels extends StatefulWidget{
 }
 
 class _ReelsState extends State<Reels>{
+  List videoUrls = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchVideos();
+  }
+
+  dynamic parseJson(String responseBody){
+    final jsonBody = json.decode(responseBody);
+    final List<dynamic> videos = jsonBody['videos'];
+    return videos
+          .map((video) => '${video['video_files'][0]['link']}')
+          .toList();
+  }
+
+  Future<void> fetchVideos() async {
+    final response = await http.get(
+        Uri.parse('https://api.pexels.com/videos/search?query=spring&per_page=3&page=1'),
+                  headers: {'Authorization': '563492ad6f9170000100000102da905b8a4c42738c484891922b2be4'}); 
+    if (response.statusCode == 200) {
+      setState(() {
+        videoUrls = parseJson(response.body);
+      });
+      print(videoUrls);
+    } else {
+      print('Failed to fetch videos');
+    }
+  }
+
   final PageController _pageController = PageController();
 
   Uint8List? _file;
@@ -106,10 +138,11 @@ class _ReelsState extends State<Reels>{
 
   @override
   Widget build(BuildContext context) {
-
-    final List<Widget> reels = List.generate(widget.usernames.length, (index) {
-      return Reel(username: widget.usernames[index]);
+    print(videoUrls.length);
+    final List<Widget> reels = List.generate(videoUrls.length, (index) {
+      return Reel(username: widget.usernames[index], videoUrl: videoUrls[index]);
     });
+    print(reels);
 
     return reels.isEmpty ?
     Center(

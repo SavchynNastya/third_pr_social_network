@@ -20,7 +20,7 @@ class Comment extends StatelessWidget {
             children: [
               TextSpan(
                 text: comment.username,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.titleSmall,
               ),
               const WidgetSpan(
                 child: SizedBox(
@@ -29,6 +29,7 @@ class Comment extends StatelessWidget {
               ),
               TextSpan(
                 text: comment.commentText,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
             ]
           ),

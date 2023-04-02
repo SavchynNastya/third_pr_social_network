@@ -9,6 +9,8 @@ import 'package:social_network/models/user_model.dart';
 import 'package:social_network/nav_pages/login.dart';
 import 'package:social_network/models/story_model.dart';
 import 'package:social_network/models/story_collection_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'theme.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,15 +25,24 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider.value(value: PostsModel()),
+        // ChangeNotifierProvider.value(value: PostsModel()),
+        BlocProvider<PostsCubit>(create: (context) => PostsCubit()),
         ChangeNotifierProvider.value(value: UserModel()),
         ChangeNotifierProvider.value(value: StoriesModel()),
         ChangeNotifierProvider.value(value: StoryCollectionModel()),
+        BlocProvider<ThemeCubit>(create: (context) => ThemeCubit()..getThemeMode()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Login(),
-      ),
+      child: BlocBuilder<ThemeCubit, ThemeMode>(
+        builder: (context, themeMode) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData.light(),
+            darkTheme: ThemeData.dark(),
+            themeMode: themeMode,
+            home: Login(),
+          );
+        }
+      )
     );
   }
 }

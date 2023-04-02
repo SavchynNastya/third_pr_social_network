@@ -82,10 +82,9 @@ class _SignUpState extends State<SignUp> {
               flex: 2,
               child: Container(),
             ),
-            const Text(
+            Text(
               'Instagram',
-              style: TextStyle(
-                  color: Colors.black, fontSize: 34, fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(
               height: 15,

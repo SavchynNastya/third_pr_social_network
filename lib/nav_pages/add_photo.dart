@@ -72,7 +72,7 @@ class _AddPhotoState extends State<AddPhoto> {
       _loading = true;
     });
     try {
-      String res = await PostsModel().uploadPost(
+      String res = await PostsCubit().uploadPost(
         _imageFile!,
         uid,
         username,
@@ -195,7 +195,7 @@ class _AddPhotoState extends State<AddPhoto> {
                             decoration: BoxDecoration(
                               image: DecorationImage(
                                 image: MemoryImage(_imageFile!),
-                                fit: BoxFit.fill,
+                                fit: BoxFit.cover,
                                 alignment: FractionalOffset.topCenter,
                               ),
                             ),

@@ -71,10 +71,9 @@ class _LoginState extends State<Login> {
             child: Container(),
             flex: 2,
           ),
-          const Text(
+          Text(
             'Instagram',
-            style: TextStyle(
-                color: Colors.black, fontSize: 34, fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.headlineMedium,
           ),
           const SizedBox(
             height: 50,

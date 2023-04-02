@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:social_network/models/post.dart';
 import 'package:social_network/models/story.dart';
 import 'package:social_network/nav_pages/components/story_circle.dart';
 // import 'package:social_network/nav_pages/direct.dart';
@@ -13,6 +14,8 @@ import 'package:social_network/nav_pages/components/post.dart';
 import 'package:social_network/nav_pages/add_story.dart';
 import 'package:social_network/models/story_model.dart';
 import 'package:social_network/models/story.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_network/models/posts_storage.dart';
 
 class Feeds extends StatelessWidget {
   Feeds({super.key}) ;
@@ -28,9 +31,7 @@ class Feeds extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(
-          color: Colors.black,
-        ),
+        iconTheme: Theme.of(context).iconTheme,
         backgroundColor: Colors.transparent,
         elevation: 0,
         title:     
@@ -53,11 +54,11 @@ class Feeds extends StatelessWidget {
                     },
                     child: Icon(
                       Icons.add_circle_outline,
-                      color: Color.fromARGB(255, 255, 255, 255),
+                      color: Theme.of(context).iconTheme.color,
                     ),
                   ),
                 ),
-                const Text('Instagram', style: TextStyle(color: Colors.black)),
+                Text('Instagram', style: Theme.of(context).textTheme.headlineSmall),
             ],
             ),
           Row(
@@ -72,7 +73,7 @@ class Feeds extends StatelessWidget {
                     //       builder: (context) => Liked(usernames: usernames)),
                     // );
                   },
-                  icon: const Icon(Icons.favorite_outline),
+                  icon: Icon(Icons.favorite_outline, color: Theme.of(context).iconTheme.color),
                 ),
               ),
               IconButton(
@@ -83,7 +84,7 @@ class Feeds extends StatelessWidget {
                   //       builder: (context) => Direct(usernames: usernames)),
                   // );
                 },
-                icon: const Icon(Icons.messenger_outline),
+                icon: Icon(Icons.messenger_outline, color: Theme.of(context).iconTheme.color),
               ),
             ],
           )
@@ -162,29 +163,34 @@ class Feeds extends StatelessWidget {
                 );
               },
             ),
-            Consumer<PostsModel>(
-              builder: (context, postsModel, child) {
-                Provider.of<PostsModel>(context).fetchPosts(user.uid);
-                if (postsModel.posts.isEmpty) {
+           
+            StreamBuilder<List<Post>>(
+              stream:
+                  context.watch<PostsCubit>().feedPostsStream(user.uid),
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
+                final feedPosts = snapshot.data ?? [];
+                if (feedPosts.isEmpty) {
                   return Expanded(
                     child: Center(
-                      child: Text('No new posts for you'),
+                      child: Text('No new posts for you',
+                          style: Theme.of(context).textTheme.bodySmall),
                     ),
                   );
                 }
-
                 return Expanded(
                   child: ListView.builder(
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
-                    itemCount: postsModel.posts.length,
+                    itemCount: feedPosts.length,
                     itemBuilder: (context, index) {
-                      return PostCard(post: postsModel.posts[index]);
+                      return PostCard(post: feedPosts[index]);
                     },
                   ),
                 );
               },
-              child: SizedBox(),
             ),
           ],
         ),

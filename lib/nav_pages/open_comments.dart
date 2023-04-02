@@ -36,30 +36,44 @@ class _OpenCommentsState extends State<OpenComments> {
   final commentController = TextEditingController();
 
   final ButtonStyle elevatedButtonStyle = ElevatedButton.styleFrom(
-      foregroundColor: Colors.blue.shade500,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ));
+    foregroundColor: Colors.blue.shade500,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.all(Radius.circular(10)),
+    )
+  );
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   context
+  //       .read<PostsCubit>()
+  //       .fetchPostComments(widget.post.postId)
+  //       .listen((comments) {
+  //     setState(() {
+  //       this.comments = comments;
+  //     });
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final postModel = Provider.of<PostsModel>(context, listen: false);
-    // postModel.fetchPostComments(widget.postId);
-    final postCommentsStream = postModel.fetchPostComments(widget.postId);
+    // final postModel = Provider.of<PostsModel>(context, listen: false);
+    // // postModel.fetchPostComments(widget.postId);
+    // final postCommentsStream = postModel.fetchPostComments(widget.postId);
+
+    final postCubit = context.watch<PostsCubit>();
+    final postCommentsStream = postCubit.fetchPostComments(widget.postId);
+
 
     final user = Provider.of<UserModel>(context, listen: false);
     user.fetchUser();
 
     return Scaffold(
         appBar: AppBar(
-          iconTheme: const IconThemeData(
-            color: Colors.black,
-          ),
+          iconTheme: Theme.of(context).iconTheme,
           backgroundColor: Colors.transparent,
           elevation: 0,
-          title: const Text('Comments',
-              style:
-                  TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          title: Text('Comments', style: Theme.of(context).textTheme.headlineSmall),
         ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -127,7 +141,7 @@ class _OpenCommentsState extends State<OpenComments> {
                     print(newComment);
                     setState(() {
                       newComment = commentController.text;
-                      postModel.postComment(widget.postId, newComment, user.uid,
+                      postCubit.postComment(widget.postId, newComment, user.uid,
                           user.username, user.profilePic);
                       // widget.updateComments?.call(newComment, widget.postId);
                       newComment = '';
