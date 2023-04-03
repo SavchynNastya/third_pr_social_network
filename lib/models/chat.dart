@@ -8,6 +8,18 @@ class Chat {
 
   Chat({required this.id, required this.members, required this.messages});
 
+   Chat copyWith({
+    String? id,
+    List<String>? members,
+    List<Message>? messages,
+  }) {
+    return Chat(
+      id: id ?? this.id,
+      members: members ?? this.members,
+      messages: messages ?? this.messages,
+    );
+  }
+
   static Chat fromSnap(DocumentSnapshot snap) {
     var snapshot = snap.data() as Map<String, dynamic>;
     List<dynamic> messageDocs = snap['messages'];

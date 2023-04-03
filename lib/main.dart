@@ -4,11 +4,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:social_network/models/posts_model.dart';
-import 'package:social_network/models/user_model.dart';
-import 'package:social_network/nav_pages/login.dart';
-import 'package:social_network/models/story_model.dart';
-import 'package:social_network/models/story_collection_model.dart';
+import 'package:social_network/cubit/chat_cubit.dart';
+import 'package:social_network/cubit/posts_cubit.dart';
+import 'package:social_network/providers/user_provider.dart';
+import 'package:social_network/nav_pages/auth/login_screen.dart';
+import 'package:social_network/providers/story_provider.dart';
+import 'package:social_network/providers/story_collection_provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'theme.dart';
 
@@ -26,10 +27,11 @@ class MainApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         // ChangeNotifierProvider.value(value: PostsModel()),
+        BlocProvider(create: (_) => ChatCubit(chatIds: [])),
         BlocProvider<PostsCubit>(create: (context) => PostsCubit()),
-        ChangeNotifierProvider.value(value: UserModel()),
-        ChangeNotifierProvider.value(value: StoriesModel()),
-        ChangeNotifierProvider.value(value: StoryCollectionModel()),
+        ChangeNotifierProvider.value(value: UserProvider()),
+        ChangeNotifierProvider.value(value: StoriesProvider()),
+        ChangeNotifierProvider.value(value: StoryCollectionProvider()),
         BlocProvider<ThemeCubit>(create: (context) => ThemeCubit()..getThemeMode()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(

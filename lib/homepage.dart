@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'nav_pages/feed.dart';
-import 'nav_pages/account.dart';
-import 'nav_pages/search.dart';
-import 'nav_pages/add_photo.dart';
-import 'nav_pages/reels.dart';
-import 'nav_pages/components/post.dart';
+import 'nav_pages/feed/feed_screen.dart';
+import 'nav_pages/account/account_screen.dart';
+import 'nav_pages/search/search_screen.dart';
+import 'nav_pages/add_photo/add_photo_screen.dart';
+import 'nav_pages/reels/reels_screen.dart';
+import 'nav_pages/feed/components/post.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
