@@ -35,16 +35,14 @@ class _DirectState extends State<Direct>{
 
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(
-          color: Colors.black,
-        ),
+        iconTheme: Theme.of(context).iconTheme,
         backgroundColor: Colors.transparent,
         elevation: 0,
         title:
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween, 
             children: [
-              Text(user.username, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+              Text(user.username, style: Theme.of(context).textTheme.headlineSmall),
               Row(
                 children: const [
                   Padding(
@@ -70,18 +68,18 @@ class _DirectState extends State<Direct>{
                 child: TextFormField(
                   textAlignVertical: TextAlignVertical.center,
                   decoration: InputDecoration(
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       Icons.search,
-                      color: Colors.white,
+                      color: Theme.of(context).disabledColor,
                     ),
                     hintText: 'Search',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
                       borderSide: BorderSide.none,
                     ),
-                    hintStyle: const TextStyle(color: Colors.white),
-                    filled: true,
-                    fillColor: const Color.fromARGB(255, 221, 221, 221),
+                    hintStyle: Theme.of(context).textTheme.labelLarge,
+                    filled: false,
+                    fillColor: Theme.of(context).scaffoldBackgroundColor,
                     contentPadding: const EdgeInsets.symmetric(vertical: 3),
                   ),
                   controller: _searchController,
@@ -95,13 +93,13 @@ class _DirectState extends State<Direct>{
             Padding(padding: const EdgeInsets.all(10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text('Messages', style: TextStyle(fontWeight: FontWeight.w400, color: Colors.black, fontSize: 20)),
-                  Text('Requests',
+                children: [
+                  Text('Messages', style: Theme.of(context).textTheme.titleLarge),
+                  const Text('Requests',
                     style: TextStyle(
                       fontWeight: FontWeight.w300,
                       color: Colors.blue,
-                      fontSize: 18
+                      fontSize: 20
                     )
                   ),
                 ],
@@ -120,11 +118,11 @@ class _DirectState extends State<Direct>{
                           .get(),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
                       return Center(child: Text('Error: ${snapshot.error}'));
                     } else if (!snapshot.hasData) {
-                      return Center(child: Text('No chats found.'));
+                      return const Center(child: Text('No chats found.'));
                     } else {
                       final docs = snapshot.data!.docs;
                       final data = docs.map((doc) => doc.data()).toList();
@@ -170,8 +168,16 @@ class _DirectState extends State<Direct>{
                 ListView.builder(
                   itemCount: 3,
                   itemBuilder: (context, index) {
-                    return NewDialog(
-                      chatId: 'jdhg',
+                    return InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) =>
+                              Chat(chatId: 'chatid'),
+                        ));
+                      },
+                      child: NewDialog(
+                        chatId: 'chatid',
+                      ),
                     );
                   }
                 ),

@@ -7,13 +7,7 @@ class NewDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: const BoxDecoration(
-          border: Border(
-            top: BorderSide(color: Color.fromARGB(255, 216, 216, 216), width: 1),
-            bottom: BorderSide(color: Color.fromARGB(255, 216, 216, 216), width: 1),
-          )
-        ),
-        padding: const EdgeInsets.only(top: 5, bottom: 5),
+        padding: const EdgeInsets.only(top: 8, bottom: 8),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

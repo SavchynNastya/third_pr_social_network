@@ -11,7 +11,7 @@ class Message extends StatelessWidget {
         alignment: Alignment.centerLeft,
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).primaryColorDark,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(

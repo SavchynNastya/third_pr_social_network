@@ -251,7 +251,7 @@ class _Account extends State<Account> {
                           ],
                         ),
                       )
-                    : const SizedBox.shrink(),
+                    : null,
                 body:
                     // Consumer<PostsModel>(
                     // builder: (context, postsModel, child) {
