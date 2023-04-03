@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import './message.dart';
 
 class Chat extends StatefulWidget {
-  final String chatId;
-  const Chat({super.key, required this.chatId});
+  final dynamic chat;
+  const Chat({super.key, required this.chat});
 
   @override
   State<Chat> createState() => _ChatState();
@@ -24,6 +24,8 @@ class _ChatState extends State<Chat>{
         _showSuffixIcons = !_focusNode.hasFocus;
       });
     });
+
+    
   }
 
   @override
@@ -50,7 +52,7 @@ class _ChatState extends State<Chat>{
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween, 
               children: [
-                Text(widget.chatId, style: Theme.of(context).textTheme.headlineSmall),
+                Text(widget.chat.members.where, style: Theme.of(context).textTheme.headlineSmall),
                 Row(
                   children: const [
                     Icon(Icons.phone_outlined),

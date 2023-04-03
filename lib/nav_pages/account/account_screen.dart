@@ -33,6 +33,7 @@ class Account extends StatefulWidget {
 }
 
 class _Account extends State<Account> {
+  late final user;
   bool _loading = false;
 
   int followers = 0;
@@ -58,19 +59,16 @@ class _Account extends State<Account> {
   );
 
   @override
-  Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context, listen: false);
-    // user.fetchUserById(widget.userId);
-    // Provider.of<PostsModel>(context).fetchPosts(widget.userId);
-    // print(FirebaseAuth.instance.currentUser!.uid);
-    // print(widget.userId);
-    // print(user.username);
+  void initState(){
+    super.initState();
+    user = Provider.of<UserProvider>(context, listen: false);
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return FutureBuilder(
       future: user.fetchUserById(widget.userId),
       builder: (context, snapshot) {
-        // Provider.of<PostsModel>(context).fetchPosts(widget.userId);
-        // BlocProvider.of<PostsCubit>(context).fetchPosts(widget.userId);
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
             child: CircularProgressIndicator(),

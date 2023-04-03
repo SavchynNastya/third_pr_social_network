@@ -1,8 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:social_network/providers/user_provider.dart';
+import 'package:provider/provider.dart';
 
-class NewDialog extends StatelessWidget {
-  final String chatId;
-  const NewDialog({super.key, required this.chatId});
+class DialogLabel extends StatefulWidget {
+  final dynamic chat;
+  const DialogLabel({super.key, required this.chat});
+
+  @override
+  State<DialogLabel> createState() => _DialogLabelState();
+}
+
+class _DialogLabelState extends State<DialogLabel>{
+  late final recipientUser;
+
+  @override
+  void initState(){
+    recipientUser = Provider.of<UserProvider>(context, listen: false);
+    recipientUser.fetchUserById(widget.chat.members[0]);
+    print(recipientUser.username);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +61,7 @@ class NewDialog extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      chatId,
+                      recipientUser.username,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(

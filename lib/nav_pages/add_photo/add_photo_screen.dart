@@ -17,6 +17,7 @@ class AddPhoto extends StatefulWidget {
 }
 
 class _AddPhotoState extends State<AddPhoto> {
+  late final user;
   Uint8List? _imageFile;
   bool _loading = false;
   final TextEditingController _captionController = TextEditingController();
@@ -103,10 +104,14 @@ class _AddPhotoState extends State<AddPhoto> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context, listen: false);
+  void initState(){
+    super.initState();
+    user = Provider.of<UserProvider>(context, listen: false);
     user.fetchUser();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return _imageFile == null
         ? Center(
             child: IconButton(

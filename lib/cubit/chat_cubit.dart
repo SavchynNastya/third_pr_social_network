@@ -1,7 +1,9 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:social_network/models/chat.dart';
 import 'package:social_network/models/message.dart';
+import 'package:uuid/uuid.dart';
 
 class ChatState {
   final Chat chat;
@@ -31,6 +33,7 @@ class ChatState {
 
 class ChatCubit extends Cubit<List<ChatState>> {
   final List<String> chatIds;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   ChatCubit({required this.chatIds}) : super([]);
 
@@ -92,11 +95,13 @@ class ChatCubit extends Cubit<List<ChatState>> {
         final chat = Chat.fromSnap(chatSnapshot.docs[0]);
         chats.add(chat);
       } else {
+        String chatId = const Uuid().v1();
         final emptyChat = Chat(
           messages: [],
-          members: [userId],
-          id: '',
+          members: [userId, FirebaseAuth.instance.currentUser!.uid],
+          id: chatId,
         );
+        _firestore.collection('chats').doc(chatId).set(emptyChat.toJson());
         chats.add(emptyChat);
       }
     }

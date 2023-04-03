@@ -17,18 +17,43 @@ import 'package:social_network/models/story.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_network/models/posts_storage.dart';
 
-class Feeds extends StatelessWidget {
-  Feeds({super.key}) ;
-  
+class Feed extends StatefulWidget {
+  Feed({super.key}) ;
+
+  @override
+  State<Feed> createState() => _FeedState();
+}
+
+class _FeedState extends State<Feed>{
+  late final Stream<Map<String, List<Story>>> storiesStream;
+  late final storiesModel;
+  late final user;
+  bool _loading = false;
+
+  @override
+  void initState(){
+    super.initState();
+
+    setState(() {
+      _loading = true;
+    });
+
+    user = Provider.of<UserProvider>(context, listen: false);
+    user.fetchUser();
+    storiesModel = Provider.of<StoriesProvider>(context, listen: false);
+    storiesStream = storiesModel.fetchUserStories(user.uid);
+
+    setState(() {
+      _loading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context);
-    user.fetchUser();
-    final storiesModel = Provider.of<StoriesProvider>(context, listen: false);
-    final Stream<Map<String, List<Story>>> storiesStream = storiesModel.fetchUserStories(user.uid);
-
-    return Scaffold(
+    return _loading ?
+    Center(child: CircularProgressIndicator(),)
+    :
+    Scaffold(
       appBar: AppBar(
         iconTheme: Theme.of(context).iconTheme,
         backgroundColor: Colors.transparent,

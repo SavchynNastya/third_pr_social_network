@@ -37,7 +37,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.initState();
 
     _children.addAll([
-      Feeds(),
+      Feed(),
       const Search(),
       const AddPhoto(),
       Reels(

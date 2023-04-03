@@ -16,6 +16,7 @@ class AddStory extends StatefulWidget {
 }
 
 class _AddStoryState extends State<AddStory> {
+  late final user;
   bool _loading = false;
   final ImagePicker _picker = ImagePicker();
   Uint8List? _imageFile;
@@ -61,9 +62,14 @@ class _AddStoryState extends State<AddStory> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context, listen: false);
+  void initState(){
+    super.initState();
+    user = Provider.of<UserProvider>(context, listen: false);
     user.fetchUser();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return GestureDetector(
       onVerticalDragUpdate: (details) async {
         if (details.delta.dy < 20) {

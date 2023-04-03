@@ -15,48 +15,51 @@ class Direct extends StatefulWidget {
 
   @override
   State<Direct> createState() => _DirectState();
-
 }
 
-class _DirectState extends State<Direct>{
+class _DirectState extends State<Direct> {
   final TextEditingController _searchController = TextEditingController();
   bool showSearchedChats = false;
 
+  late final user;
+
   @override
-  void dispose(){
+  void dispose() {
     super.dispose();
     _searchController.dispose();
   }
 
   @override
-  Widget build(BuildContext context) {
-    final user = Provider.of<UserProvider>(context);
+  void initState() {
+    super.initState();
+    user = Provider.of<UserProvider>(context, listen: false);
     user.fetchUser();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         iconTheme: Theme.of(context).iconTheme,
         backgroundColor: Colors.transparent,
         elevation: 0,
         title:
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Text(user.username, style: Theme.of(context).textTheme.headlineSmall),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween, 
-            children: [
-              Text(user.username, style: Theme.of(context).textTheme.headlineSmall),
-              Row(
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.only(right: 10),
-                    child: Icon(Icons.video_call),
-                  ),
-                  Icon(Icons.add),
-                ],
+            children: const [
+              Padding(
+                padding: EdgeInsets.only(right: 10),
+                child: Icon(Icons.video_call),
               ),
-            ]),
+              Icon(Icons.add),
+            ],
+          ),
+        ]),
       ),
       body: GestureDetector(
         onHorizontalDragUpdate: (details) {
-          if(details.delta.dx > 0){
+          if (details.delta.dx > 0) {
             Navigator.pop(context);
           }
         },
@@ -84,104 +87,129 @@ class _DirectState extends State<Direct>{
                   ),
                   controller: _searchController,
                   onFieldSubmitted: (String _) {
+                    setState(() {
+                      showSearchedChats = true;
+                    });
                     print(_);
-                    showSearchedChats = true;
                   },
                 ),
               ),
             ),
-            Padding(padding: const EdgeInsets.all(10),
+            Padding(
+              padding: const EdgeInsets.all(10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Messages', style: Theme.of(context).textTheme.titleLarge),
+                  Text('Messages',
+                      style: Theme.of(context).textTheme.titleLarge),
                   const Text('Requests',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w300,
-                      color: Colors.blue,
-                      fontSize: 20
-                    )
-                  ),
+                      style: TextStyle(
+                          fontWeight: FontWeight.w300,
+                          color: Colors.blue,
+                          fontSize: 20)),
                 ],
               ),
             ),
             Expanded(
-              child: 
-                showSearchedChats ?
-                FutureBuilder(
-                  future: FirebaseFirestore.instance
-                          .collection('users')
-                          .where(
-                            'username',
-                            isGreaterThanOrEqualTo: _searchController.text,
-                          )
-                          .get(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (!snapshot.hasData) {
-                      return const Center(child: Text('No chats found.'));
-                    } else {
-                      final docs = snapshot.data!.docs;
-                      final data = docs.map((doc) => doc.data()).toList();
-                      print('$data DataDATAAAAAAAAA');
-                      final ids = docs.map((doc) => doc.id).toList();
-                      return BlocConsumer<ChatCubit, List<ChatState>>(
-                       listener: (context, state) {
-                        context.read<ChatCubit>().fetchChatsForFollowedUsers(ids);
-                       },
-                       builder: (contex, state){
-                        
-                        final chats = state.map((chatState) => chatState.chat).toList();
-                        return ListView.builder(
-                          itemCount: (snapshot.data as dynamic).docs.length,
-                          itemBuilder: (context, index) {
-                            // final data = docs[index].data();
-                            // final hasUsername = data.containsKey('username');
-                            // final hasPhotoUrl = data.containsKey('photoUrl');
-                            // if (hasUsername && hasPhotoUrl) {
-                              return InkWell(
-                                onTap: () {
-                                  Navigator.of(context)
-                                      .push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        Chat(chatId: chats[index].id),
-                                  ));
+                child: showSearchedChats
+                    ? FutureBuilder(
+                        future: FirebaseFirestore.instance
+                            .collection('users')
+                            .where(
+                              'username',
+                              isGreaterThanOrEqualTo: _searchController.text,
+                            )
+                            .get(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else if (!snapshot.hasData) {
+                            return const Center(child: Text('No chats found.'));
+                          } else {
+                            final docs = snapshot.data!.docs;
+                            final ids = docs.map((doc) => doc.id).toList();
+                            return BlocBuilder<ChatCubit, List<ChatState>>(
+                                builder: (contex, state) {
+                              context
+                                  .read<ChatCubit>()
+                                  .fetchChatsForFollowedUsers(ids);
+                              final chats = state
+                                  .map((chatState) => chatState.chat)
+                                  .toList();
+                              return ListView.builder(
+                                itemCount: chats.length,
+                                itemBuilder: (context, index) {
+                                  return InkWell(
+                                    onTap: () {
+                                      Navigator.of(context)
+                                          .push(MaterialPageRoute(
+                                        builder: (context) =>
+                                            Chat(chat: chats[index]),
+                                      ));
+                                    },
+                                    child: DialogLabel(
+                                      chat: chats[index],
+                                    ),
+                                  );
+                                  // }
                                 },
-                                child: NewDialog(
-                                  chatId: chats[index].id,
-                                ),
                               );
-                            // }
-                          },
-                        );
-                       }
-                      );
-                      
-                    }
-                  },
-                )
-                :
-                
-                ListView.builder(
-                  itemCount: 3,
-                  itemBuilder: (context, index) {
-                    return InkWell(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) =>
-                              Chat(chatId: 'chatid'),
-                        ));
-                      },
-                      child: NewDialog(
-                        chatId: 'chatid',
-                      ),
-                    );
-                  }
-                ),
-            ),
+                            });
+                          }
+                        },
+                      )
+                    : FutureBuilder(
+                        future: FirebaseFirestore.instance
+                            .collection('users')
+                            .where('followers', arrayContains: user.uid)
+                            .get(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                                child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else if (!snapshot.hasData) {
+                            return const Center(child: Text('No chats found.'));
+                          } else {
+                            final docs = snapshot.data!.docs;
+                            final ids = docs.map((doc) => doc.id).toList();
+                            return BlocBuilder<ChatCubit, List<ChatState>>(
+                                builder: (contex, state) {
+                              context
+                                  .read<ChatCubit>()
+                                  .fetchChatsForFollowedUsers(ids);
+                              final chats = state
+                                  .map((chatState) => chatState.chat)
+                                  .toList();
+                              return ListView.builder(
+                                itemCount: chats.length,
+                                itemBuilder: (context, index) {
+                                  return InkWell(
+                                    onTap: () {
+                                      Navigator.of(context)
+                                          .push(MaterialPageRoute(
+                                        builder: (context) =>
+                                            Chat(chat: chats[index]),
+                                      ));
+                                    },
+                                    child: DialogLabel(
+                                      chat: chats[index]
+                                    )
+                                  );
+                                },
+                              );
+                            });
+                          }
+                        },
+                      )),
           ],
         ),
       ),
