@@ -23,6 +23,8 @@ class Chat {
   static Chat fromSnap(DocumentSnapshot snap) {
     var snapshot = snap.data() as Map<String, dynamic>;
     List<dynamic> messageDocs = snap['messages'];
+    print(messageDocs);
+    print(messageDocs.map((doc) => print(doc)));
     List<Message> messages =
         messageDocs.map((doc) => Message.fromSnap(doc)).toList();
 

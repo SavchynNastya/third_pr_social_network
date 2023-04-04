@@ -17,35 +17,46 @@ class ChatState {
   }
 }
 
-// abstract class ChatEvent {}
-
-// class SendMessageEvent extends ChatEvent {
-//   final Message message;
-
-//   SendMessageEvent(this.message);
-// }
-
-// class DeleteMessageEvent extends ChatEvent {
-//   final Message message;
-
-//   DeleteMessageEvent(this.message);
-// }
-
 class ChatCubit extends Cubit<List<ChatState>> {
   final List<String> chatIds;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   ChatCubit({required this.chatIds}) : super([]);
 
-  void sendMessage(String chatId, Message message) {
+  // void sendMessage(String chatId, Message message) {
+  //   final index = state.indexWhere((chatState) => chatState.chat.id == chatId);
+  //   if (index == -1) {
+  //     throw Exception('Chat with id $chatId not found');
+  //   }
+  //   final newChat = state[index].chat.copyWith();
+  //   newChat.sendMessage(message);
+  //   final newChatStateList = List.of(state);
+  //   newChatStateList[index] = ChatState(newChat);
+  //   emit(newChatStateList);
+  // }
+
+  void sendMessage(String chatId, String messageText, String recipientId) {
     final index = state.indexWhere((chatState) => chatState.chat.id == chatId);
     if (index == -1) {
       throw Exception('Chat with id $chatId not found');
     }
     final newChat = state[index].chat.copyWith();
+
+    String messageId = const Uuid().v1();
+    String senderId = newChat.members.firstWhere((element) => element != recipientId);
+
+    Message message = Message(
+      messageId: messageId, 
+      senderId: senderId, 
+      recipientId: recipientId, 
+      messageText: messageText, 
+      timestamp: DateTime.now(),
+    );
+
     newChat.sendMessage(message);
     final newChatStateList = List.of(state);
     newChatStateList[index] = ChatState(newChat);
+
     emit(newChatStateList);
   }
 
@@ -58,29 +69,44 @@ class ChatCubit extends Cubit<List<ChatState>> {
     newChat.deleteMessage(message);
     final newChatStateList = List.of(state);
     newChatStateList[index] = ChatState(newChat);
+    
     emit(newChatStateList);
   }
 
-  void loadChat(String chatId) {
-    FirebaseFirestore.instance
-        .collection('chats')
-        .doc(chatId)
-        .snapshots()
-        .listen((snapshot) {
-      final chat = Chat.fromSnap(snapshot);
-      final index =
-          state.indexWhere((chatState) => chatState.chat.id == chatId);
-      if (index == -1) {
-        final newChatStateList = List.of(state);
-        newChatStateList.add(ChatState(chat));
-        emit(newChatStateList);
-      } else {
-        final newChatStateList = List.of(state);
-        newChatStateList[index] = ChatState(chat);
-        emit(newChatStateList);
-      }
-    });
-  }
+  // void loadChat(String chatId) {
+  //   FirebaseFirestore.instance
+  //       .collection('chats')
+  //       .doc(chatId)
+  //       .snapshots()
+  //       .listen((snapshot) {
+  //     final chat = Chat.fromSnap(snapshot);
+  //     final index =
+  //         state.indexWhere((chatState) => chatState.chat.id == chatId);
+  //     if (index == -1) {
+  //       final newChatStateList = List.of(state);
+  //       newChatStateList.add(ChatState(chat));
+  //       emit(newChatStateList);
+  //     } else {
+  //       final newChatStateList = List.of(state);
+  //       newChatStateList[index] = ChatState(chat);
+  //       emit(newChatStateList);
+  //     }
+  //   });
+  // }
+
+  // Stream<List<Message>> messagesStream(String chatId) {
+  //   // return FirebaseFirestore.instance
+  //   //     .collection('chats')
+  //   //     .doc(chatId)
+  //   //     .collection('messages')
+  //   //     .orderBy('timestamp')
+  //   //     .snapshots()
+  //   //     .map((QuerySnapshot querySnapshot) => querySnapshot.docs
+  //   //         .map((DocumentSnapshot documentSnapshot) =>
+  //   //             Message.fromSnap(documentSnapshot))
+  //   //         .toList());
+
+  // }
 
   Future<void> fetchChatsForFollowedUsers(List<String> followedUserIds) async {
     final List<Chat> chats = [];
@@ -92,6 +118,7 @@ class ChatCubit extends Cubit<List<ChatState>> {
           .get();
 
       if (chatSnapshot.docs.isNotEmpty) {
+        print(chatSnapshot.docs[0].data());
         final chat = Chat.fromSnap(chatSnapshot.docs[0]);
         chats.add(chat);
       } else {
@@ -110,21 +137,3 @@ class ChatCubit extends Cubit<List<ChatState>> {
     emit(chatStateList);
   }
 }
-
-  // @override
-  // void onChange(Change<ChatState> change) {
-  //   debugPrint(change.toString());
-  //   super.onChange(change);
-  // }
-
-  // @override
-  // void onEvent(ChatEvent event) {
-  //   debugPrint(event.toString());
-  //   super.onEvent(event);
-  // }
-
-  // @override
-  // void onError(Object error, StackTrace stackTrace) {
-  //   debugPrint(error.toString());
-  //   super.onError(error, stackTrace);
-  // }

@@ -62,9 +62,11 @@ class _DialogLabelState extends State<DialogLabel>{
                       width: 55,
                       height: 55,
                       alignment: Alignment.center,
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.grey,
+                        image: DecorationImage(
+                          image: NetworkImage(recipientUser.profilePic)
+                        ),
                       ),
                     ),
                   ),

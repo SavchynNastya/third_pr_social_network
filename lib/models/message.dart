@@ -34,4 +34,6 @@ class Message {
     'messageText': messageText,
     'timestamp': timestamp,
   };
+
+  static fromJson(messageMap) {}
 }

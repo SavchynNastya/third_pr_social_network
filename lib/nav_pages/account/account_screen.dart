@@ -1,4 +1,3 @@
-// ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_constructors
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,7 +25,7 @@ import 'package:social_network/theme.dart';
 class Account extends StatefulWidget {
   final String userId;
 
-  Account({super.key, required this.userId});
+  const Account({super.key, required this.userId});
 
   @override
   State<Account> createState() => _Account();
@@ -62,12 +61,6 @@ class _Account extends State<Account> {
   void initState(){
     super.initState();
     user = Provider.of<UserProvider>(context, listen: false);
-  }
-
-  @override
-  void dispose() {
-    user.clear();
-    super.dispose();
   }
 
   @override

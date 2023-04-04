@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_network/cubit/chat_cubit.dart';
 import './message.dart';
+import 'package:provider/provider.dart';
+import 'package:social_network/providers/user_provider.dart';
+import 'package:social_network/models/message.dart' as message_model;
 
 class Chat extends StatefulWidget {
   final dynamic chat;
@@ -11,6 +16,9 @@ class Chat extends StatefulWidget {
 }
 
 class _ChatState extends State<Chat>{
+  final TextEditingController _messageController = TextEditingController();
+  late final recipientUser;
+  bool _loading = false;
 
   late final FocusNode _focusNode;
   bool _showSuffixIcons = true;
@@ -25,12 +33,23 @@ class _ChatState extends State<Chat>{
       });
     });
 
+    setState(() {
+      _loading = true;
+    });
+
+    recipientUser = Provider.of<UserProvider>(context, listen: false);
+    recipientUser.fetchUserById(widget.chat.members[0]).then((_) {
+      setState(() {
+        _loading = false;
+      });
+    });
     
   }
 
   @override
   void dispose() {
     _focusNode.dispose();
+    _messageController.dispose();
     super.dispose();
   }
 
@@ -38,9 +57,41 @@ class _ChatState extends State<Chat>{
     _focusNode.unfocus();
   }
 
+  void deleteMessage(BuildContext parentContext, message_model.Message message) async{
+      return showDialog(
+        context: parentContext,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            title: const Text('Delete a message?'),
+            children: <Widget>[
+            SimpleDialogOption(
+                padding: const EdgeInsets.all(20),
+                child: const Text('Yes'),
+                onPressed: () async {
+                  Navigator.pop(context);
+                  BlocProvider.of<ChatCubit>(context, listen: false)
+                      .deleteMessage(
+                          widget.chat.id, message);
+                }),
+            SimpleDialogOption(
+              padding: const EdgeInsets.all(20),
+              child: const Text("Cancel"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          ],
+          );
+        },
+      );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return _loading ?
+    const Center(child: CircularProgressIndicator(),)
+    :
+    GestureDetector(
       onTap: _handleTap,
       child: Scaffold(
         extendBody: false,
@@ -52,7 +103,7 @@ class _ChatState extends State<Chat>{
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween, 
               children: [
-                Text(widget.chat.members.where, style: Theme.of(context).textTheme.headlineSmall),
+                Text(recipientUser.username, style: Theme.of(context).textTheme.headlineSmall),
                 Row(
                   children: const [
                     Icon(Icons.phone_outlined),
@@ -67,17 +118,37 @@ class _ChatState extends State<Chat>{
         ),
         body: Column(
           children: [
+            // StreamBuilder<List<message_model.Message>>(
+            //   stream: context.watch<ChatCubit>().messagesStream(widget.chat.id),
+            //   builder: (BuildContext context, AsyncSnapshot<List<message_model.Message>> snapshot) {
+            //     if (snapshot.hasError) {
+            //       return Text('Error: ${snapshot.error}');
+            //     }
+
+            //     if (!snapshot.hasData) {
+            //       return const CircularProgressIndicator();
+            //     }
+
+            //     List<message_model.Message> messages = snapshot.data!;
+            //     print(messages);
+
             Expanded(
-              child: ListView.builder( 
-                itemCount: 3,
-                itemBuilder: (context, index){
-                  return const Message();
-                }
+              child: ListView.builder(
+                itemCount: widget.chat.messages.length,
+                itemBuilder: (context, index) {
+                  return InkWell(
+                    onLongPress: () => deleteMessage(context, widget.chat.messages[index]),
+                    child: Message(
+                      message: widget.chat.messages[index],
+                    ),
+                  );
+                },
               ),
             ),
             BottomAppBar(
               child: TextField(
                 focusNode: _focusNode,
+                controller: _messageController,
                 textAlignVertical: TextAlignVertical.center,
                 style: Theme.of(context).textTheme.bodyMedium,
                 decoration: InputDecoration(
@@ -112,7 +183,15 @@ class _ChatState extends State<Chat>{
                       ),
                     ],
                   )
-                  : null
+                  : IconButton(
+                    onPressed: () {
+                      BlocProvider.of<ChatCubit>(context, listen: false)
+                        .sendMessage(widget.chat.id, _messageController.text, recipientUser.uid);
+                      _messageController.clear();
+                      _focusNode.unfocus();
+                    },
+                    icon: const Icon(Icons.send),
+                  ),
                 ),
               ),
             ),

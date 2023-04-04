@@ -133,7 +133,8 @@ class _DirectState extends State<Direct> {
                           } else {
                             final docs = snapshot.data!.docs;
                             final ids = docs.map((doc) => doc.id).toList();
-                            return BlocBuilder<ChatCubit, List<ChatState>>(
+                            return BlocConsumer<ChatCubit, List<ChatState>>(
+                                listener: (context, state){},
                                 builder: (contex, state) {
                               context
                                   .read<ChatCubit>()
@@ -189,6 +190,7 @@ class _DirectState extends State<Direct> {
                               final chats = state
                                   .map((chatState) => chatState.chat)
                                   .toList();
+                              // print(chats);
                               return ListView.builder(
                                 itemCount: chats.length,
                                 itemBuilder: (context, index) {
