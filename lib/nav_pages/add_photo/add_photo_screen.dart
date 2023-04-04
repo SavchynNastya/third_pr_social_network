@@ -111,6 +111,12 @@ class _AddPhotoState extends State<AddPhoto> {
   }
 
   @override
+  void dispose() {
+    user.clear();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return _imageFile == null
         ? Center(

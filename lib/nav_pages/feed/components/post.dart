@@ -231,37 +231,6 @@ class _PostCard extends State<PostCard> {
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 16.0),
-          child: widget.post.likes.isNotEmpty ?
-          Row(
-            children: [
-              Text('Liked by '),
-              Consumer<UserProvider>(
-                builder: (context, userProvider, child) {
-                  String userId = widget.post.likes.last;
-                  final user = Provider.of<UserProvider>(context);
-                  user.getUsernameById(userId);
-                  if (user.lastLikedUsername.isNotEmpty){
-                    return Text('${user.lastLikedUsername}', style: TextStyle(fontWeight: FontWeight.bold));
-                  }else{
-                    return CircularProgressIndicator();
-                  }
-                  
-                },
-              ),
-              widget.post.likes.length > 1 ?
-              Row(
-                children: const [
-                  Text(' and '),
-                  Text('others', style: TextStyle(fontWeight: FontWeight.bold)),
-                ],
-              ) :
-              SizedBox(),
-            ],
-          ) :
-          SizedBox(),
-        ),
         widget.post.desc != ""
         ?
         Padding(

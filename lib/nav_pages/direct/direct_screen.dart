@@ -1,17 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import './components/dialog.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../providers/user_provider.dart';
-import 'package:social_network/models/chat.dart' as chat_structure;
 import 'package:social_network/cubit/chat_cubit.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import './components/chat.dart';
 
 class Direct extends StatefulWidget {
-  Direct({super.key});
+  final dynamic user;
+  const Direct({super.key, required this.user});
 
   @override
   State<Direct> createState() => _DirectState();
@@ -21,20 +17,24 @@ class _DirectState extends State<Direct> {
   final TextEditingController _searchController = TextEditingController();
   bool showSearchedChats = false;
 
-  late final user;
+  // @override
+  // void dispose() {
+  //   // user.clear();
+  //   _searchController.dispose();
+  //   super.dispose();
+  // }
 
-  @override
-  void dispose() {
-    super.dispose();
-    _searchController.dispose();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   user = Provider.of<UserProvider>(context, listen: false);
+  //   user.clear();
+  //   print(FirebaseAuth.instance.currentUser!.uid);
+  //   user.fetchUser();
+  //   print(FirebaseAuth.instance.currentUser!.uid);
+  //   print(user.uid);
+  // }
 
-  @override
-  void initState() {
-    super.initState();
-    user = Provider.of<UserProvider>(context, listen: false);
-    user.fetchUser();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,7 @@ class _DirectState extends State<Direct> {
         elevation: 0,
         title:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text(user.username, style: Theme.of(context).textTheme.headlineSmall),
+          Text(widget.user.username, style: Theme.of(context).textTheme.headlineSmall),
           Row(
             children: const [
               Padding(
@@ -166,7 +166,7 @@ class _DirectState extends State<Direct> {
                     : FutureBuilder(
                         future: FirebaseFirestore.instance
                             .collection('users')
-                            .where('followers', arrayContains: user.uid)
+                            .where('followers', arrayContains: widget.user.uid)
                             .get(),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==

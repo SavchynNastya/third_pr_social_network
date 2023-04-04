@@ -65,6 +65,12 @@ class _Account extends State<Account> {
   }
 
   @override
+  void dispose() {
+    user.clear();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       future: user.fetchUserById(widget.userId),

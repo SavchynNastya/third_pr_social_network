@@ -27,33 +27,42 @@ class Feed extends StatefulWidget {
 class _FeedState extends State<Feed>{
   late final Stream<Map<String, List<Story>>> storiesStream;
   late final storiesModel;
-  late final user;
-  bool _loading = false;
+  late final UserProvider user;
 
   @override
   void initState(){
     super.initState();
 
-    setState(() {
-      _loading = true;
-    });
-
     user = Provider.of<UserProvider>(context, listen: false);
-    user.fetchUser();
     storiesModel = Provider.of<StoriesProvider>(context, listen: false);
     storiesStream = storiesModel.fetchUserStories(user.uid);
-
-    setState(() {
-      _loading = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return _loading ?
-    Center(child: CircularProgressIndicator(),)
-    :
-    Scaffold(
+    return Scaffold(
+      body: FutureBuilder<void>(
+        future: user.fetchUser(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Error fetching user data'),
+            );
+          } else {
+            return _buildContent(context);
+          }
+        },
+      ),
+    );
+  }
+
+  // @override
+  Widget _buildContent(BuildContext context) {
+    return Scaffold(
       appBar: AppBar(
         iconTheme: Theme.of(context).iconTheme,
         backgroundColor: Colors.transparent,
@@ -105,7 +114,7 @@ class _FeedState extends State<Feed>{
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => Direct()),
+                        builder: (context) => Direct(user: user,)),
                   );
                 },
                 icon: Icon(Icons.messenger_outline, color: Theme.of(context).iconTheme.color),

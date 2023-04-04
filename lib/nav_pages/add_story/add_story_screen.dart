@@ -69,6 +69,12 @@ class _AddStoryState extends State<AddStory> {
   }
 
   @override
+  void dispose() {
+    user.clear();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onVerticalDragUpdate: (details) async {

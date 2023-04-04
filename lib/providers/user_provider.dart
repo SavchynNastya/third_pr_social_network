@@ -18,6 +18,17 @@ class UserProvider extends ChangeNotifier {
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  void clear() {
+    uid = '';
+    username = '';
+    email = '';
+    followers = [];
+    following = [];
+    profilePic = '';
+    lastLikedUsername = '';
+    notifyListeners();
+  }
+
 
   Future<void> fetchUser() async {
     DocumentSnapshot userSnap = await FirebaseFirestore.instance

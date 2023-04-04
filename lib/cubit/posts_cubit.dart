@@ -29,6 +29,7 @@ class PostsCubit extends Cubit<PostsStorage>{
   //   // emit(currentState);
   // }
   Stream<List<Post>> feedPostsStream(String userId) {
+    print(userId);
     return _firestore
         .collection('posts')
         .orderBy('datePublished', descending: true)

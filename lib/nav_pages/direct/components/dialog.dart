@@ -12,17 +12,29 @@ class DialogLabel extends StatefulWidget {
 
 class _DialogLabelState extends State<DialogLabel>{
   late final recipientUser;
+  bool _loading = false;
 
   @override
   void initState(){
+    super.initState();
+    setState(() {
+      _loading = true;
+    });
+
     recipientUser = Provider.of<UserProvider>(context, listen: false);
-    recipientUser.fetchUserById(widget.chat.members[0]);
-    print(recipientUser.username);
+    recipientUser.fetchUserById(widget.chat.members[0]).then((_) {
+      setState(() {
+        _loading = false;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return _loading ?
+      const Center(child: CircularProgressIndicator(),)
+      :
+      Container(
         padding: const EdgeInsets.only(top: 8, bottom: 8),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
