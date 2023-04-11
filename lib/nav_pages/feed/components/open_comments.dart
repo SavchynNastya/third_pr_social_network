@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:social_network/cubit/posts_cubit.dart';
 import 'package:social_network/providers/user_provider.dart';
 
+
 class OpenComments extends StatefulWidget {
   String postId;
   OpenComments({super.key, required this.postId});
@@ -17,6 +18,7 @@ class OpenComments extends StatefulWidget {
 class _OpenCommentsState extends State<OpenComments> {
   late String newComment = '';
   final commentController = TextEditingController();
+  late int commentsLength;
 
   final ButtonStyle elevatedButtonStyle = ElevatedButton.styleFrom(
     foregroundColor: Colors.blue.shade500,
@@ -36,7 +38,12 @@ class _OpenCommentsState extends State<OpenComments> {
     final user = Provider.of<UserProvider>(context, listen: false);
     user.fetchUser();
 
-    return Scaffold(
+    return WillPopScope(
+      onWillPop: () async {
+        Navigator.pop(context, commentsLength);
+        return Future.value(false);
+      },
+      child: Scaffold(
         appBar: AppBar(
           iconTheme: Theme.of(context).iconTheme,
           backgroundColor: Colors.transparent,
@@ -80,6 +87,7 @@ class _OpenCommentsState extends State<OpenComments> {
                       return ListView.builder(
                         itemCount: comments.length,
                         itemBuilder: (context, index) {
+                          commentsLength = comments.length;
                           return CommentView(comment: comments[index]);
                         },
                       );
@@ -130,6 +138,8 @@ class _OpenCommentsState extends State<OpenComments> {
               ],
             )
           ],
-        ));
+        )
+      ),
+    );
   }
 }

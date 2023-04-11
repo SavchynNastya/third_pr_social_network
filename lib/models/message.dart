@@ -15,15 +15,17 @@ class Message {
     required this.timestamp,
   });
 
-  static Message fromSnap(DocumentSnapshot snap) {
-    var snapshot = snap.data() as Map<String, dynamic>;
+  static Message fromSnap(snap) {
+    if (snap.runtimeType == DocumentSnapshot){
+      snap = snap.data() as Map<String, dynamic>;
+    }
 
     return Message(
-      messageId: snapshot['messageId'],
-      senderId: snapshot['senderId'],
-      recipientId: snapshot['recipientId'],
-      messageText: snapshot['messageText'],
-      timestamp: snapshot['timestamp'].toDate(),
+      messageId: snap['messageId'],
+      senderId: snap['senderId'],
+      recipientId: snap['recipientId'],
+      messageText: snap['messageText'],
+      timestamp: snap['timestamp'].toDate(),
     );
   }
 
@@ -35,5 +37,4 @@ class Message {
     'timestamp': timestamp,
   };
 
-  static fromJson(messageMap) {}
 }

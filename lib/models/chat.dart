@@ -4,7 +4,7 @@ import 'package:social_network/models/message.dart';
 class Chat {
   final String id;
   final List<String> members;
-  final List<Message> messages;
+  final List<dynamic> messages;
 
   Chat({required this.id, required this.members, required this.messages});
 
@@ -22,10 +22,12 @@ class Chat {
 
   static Chat fromSnap(DocumentSnapshot snap) {
     var snapshot = snap.data() as Map<String, dynamic>;
-    List<dynamic> messageDocs = snap['messages'];
-    print(messageDocs);
-    print(messageDocs.map((doc) => print(doc)));
-    List<Message> messages =
+    var messageDocs = snap['messages'];
+    // print(messageDocs);
+    
+    // print(messageDocs.length);
+    // print(messageDocs.map((doc) => print("DOC $doc ${doc.runtimeType}")));
+    var messages =
         messageDocs.map((doc) => Message.fromSnap(doc)).toList();
 
     return Chat(

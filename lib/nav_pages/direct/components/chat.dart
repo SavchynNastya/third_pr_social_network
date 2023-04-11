@@ -58,6 +58,8 @@ class _ChatState extends State<Chat>{
   }
 
   void deleteMessage(BuildContext parentContext, message_model.Message message) async{
+    // final ChatCubit chatCubit =
+    //     BlocProvider.of<ChatCubit>(parentContext, listen: false);
       return showDialog(
         context: parentContext,
         builder: (BuildContext context) {
@@ -72,6 +74,8 @@ class _ChatState extends State<Chat>{
                   BlocProvider.of<ChatCubit>(context, listen: false)
                       .deleteMessage(
                           widget.chat.id, message);
+                  // chatCubit.deleteMessage(widget.chat.id, message);
+                  setState(() {});
                 }),
             SimpleDialogOption(
               padding: const EdgeInsets.all(20),

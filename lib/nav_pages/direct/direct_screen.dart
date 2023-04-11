@@ -24,16 +24,10 @@ class _DirectState extends State<Direct> {
   //   super.dispose();
   // }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   user = Provider.of<UserProvider>(context, listen: false);
-  //   user.clear();
-  //   print(FirebaseAuth.instance.currentUser!.uid);
-  //   user.fetchUser();
-  //   print(FirebaseAuth.instance.currentUser!.uid);
-  //   print(user.uid);
-  // }
+  @override
+  void initState() {
+    super.initState();
+  }
 
 
   @override
@@ -133,34 +127,68 @@ class _DirectState extends State<Direct> {
                           } else {
                             final docs = snapshot.data!.docs;
                             final ids = docs.map((doc) => doc.id).toList();
-                            return BlocConsumer<ChatCubit, List<ChatState>>(
-                                listener: (context, state){},
-                                builder: (contex, state) {
-                              context
+                            return StreamBuilder<List<ChatState>>(
+                              stream: context
                                   .read<ChatCubit>()
-                                  .fetchChatsForFollowedUsers(ids);
-                              final chats = state
-                                  .map((chatState) => chatState.chat)
-                                  .toList();
-                              return ListView.builder(
-                                itemCount: chats.length,
-                                itemBuilder: (context, index) {
-                                  return InkWell(
-                                    onTap: () {
-                                      Navigator.of(context)
-                                          .push(MaterialPageRoute(
-                                        builder: (context) =>
-                                            Chat(chat: chats[index]),
-                                      ));
+                                  .fetchChatsForFollowedUsers(ids),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return Center(child: CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return Center(child: Text('Error: ${snapshot.error}'));
+                                } else {
+                                  final chats = snapshot.data
+                                      ?.map((chatState) => chatState.chat)
+                                      .toList() ?? [];
+
+                                    // print(chats);
+
+                                  return ListView.builder(
+                                    itemCount: chats.length,
+                                    itemBuilder: (context, index) {
+                                      return InkWell(
+                                        onTap: () {
+                                          Navigator.of(context).push(MaterialPageRoute(
+                                            builder: (context) => Chat(chat: chats[index]),
+                                          ));
+                                        },
+                                        child: DialogLabel(
+                                          chat: chats[index],
+                                        ),
+                                      );
                                     },
-                                    child: DialogLabel(
-                                      chat: chats[index],
-                                    ),
                                   );
-                                  // }
-                                },
-                              );
-                            });
+                                }
+                              },
+                            );
+                            // return BlocConsumer<ChatCubit, List<ChatState>>(
+                            //     listener: (context, state){},
+                            //     builder: (contex, state) {
+                            //   context
+                            //       .read<ChatCubit>()
+                            //       .fetchChatsForFollowedUsers(ids);
+                            //   final chats = state
+                            //       .map((chatState) => chatState.chat)
+                            //       .toList();
+                            //   return ListView.builder(
+                            //     itemCount: chats.length,
+                            //     itemBuilder: (context, index) {
+                            //       return InkWell(
+                            //         onTap: () {
+                            //           Navigator.of(context)
+                            //               .push(MaterialPageRoute(
+                            //             builder: (context) =>
+                            //                 Chat(chat: chats[index]),
+                            //           ));
+                            //         },
+                            //         child: DialogLabel(
+                            //           chat: chats[index],
+                            //         ),
+                            //       );
+                            //       // }
+                            //     },
+                            //   );
+                            // });
                           }
                         },
                       )
@@ -182,33 +210,73 @@ class _DirectState extends State<Direct> {
                           } else {
                             final docs = snapshot.data!.docs;
                             final ids = docs.map((doc) => doc.id).toList();
-                            return BlocBuilder<ChatCubit, List<ChatState>>(
-                                builder: (contex, state) {
-                              context
+                            // return BlocBuilder<ChatCubit, List<ChatState>>(
+                            //     builder: (contex, state) {
+                            //   context
+                            //       .read<ChatCubit>()
+                            //       .fetchChatsForFollowedUsers(ids);
+                            //   final chats = state
+                            //       .map((chatState) => chatState.chat)
+                            //       .toList();
+                            //   // print(chats);
+                            //   return ListView.builder(
+                            //     itemCount: chats.length,
+                            //     itemBuilder: (context, index) {
+                            //       return InkWell(
+                            //         onTap: () {
+                            //           Navigator.of(context)
+                            //               .push(MaterialPageRoute(
+                            //             builder: (context) =>
+                            //                 Chat(chat: chats[index]),
+                            //           ));
+                            //         },
+                            //         child: DialogLabel(
+                            //           chat: chats[index]
+                            //         )
+                            //       );
+                            //     },
+                            //   );
+                            // });
+                            return StreamBuilder<List<ChatState>>(
+                              stream: context
                                   .read<ChatCubit>()
-                                  .fetchChatsForFollowedUsers(ids);
-                              final chats = state
-                                  .map((chatState) => chatState.chat)
-                                  .toList();
-                              // print(chats);
-                              return ListView.builder(
-                                itemCount: chats.length,
-                                itemBuilder: (context, index) {
-                                  return InkWell(
-                                    onTap: () {
-                                      Navigator.of(context)
-                                          .push(MaterialPageRoute(
-                                        builder: (context) =>
-                                            Chat(chat: chats[index]),
-                                      ));
+                                  .fetchChatsForFollowedUsers(ids),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                      child: CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return Center(
+                                      child: Text('Error: ${snapshot.error}'));
+                                } else {
+                                  final chats = snapshot.data
+                                          ?.map((chatState) => chatState.chat)
+                                          .toList() ??
+                                      [];
+
+                                      print(chats);
+
+                                  return ListView.builder(
+                                    itemCount: chats.length,
+                                    itemBuilder: (context, index) {
+                                      return InkWell(
+                                        onTap: () {
+                                          Navigator.of(context)
+                                              .push(MaterialPageRoute(
+                                            builder: (context) =>
+                                                Chat(chat: chats[index]),
+                                          ));
+                                        },
+                                        child: DialogLabel(
+                                          chat: chats[index],
+                                        ),
+                                      );
                                     },
-                                    child: DialogLabel(
-                                      chat: chats[index]
-                                    )
                                   );
-                                },
-                              );
-                            });
+                                }
+                              },
+                            );
                           }
                         },
                       )),

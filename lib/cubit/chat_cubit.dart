@@ -65,11 +65,15 @@ class ChatCubit extends Cubit<List<ChatState>> {
     if (index == -1) {
       throw Exception('Chat with id $chatId not found');
     }
+
     final newChat = state[index].chat.copyWith();
     newChat.deleteMessage(message);
     final newChatStateList = List.of(state);
     newChatStateList[index] = ChatState(newChat);
-    
+
+    // print('old state: $state');
+    // print('new state: $newChatStateList');
+
     emit(newChatStateList);
   }
 
@@ -108,32 +112,75 @@ class ChatCubit extends Cubit<List<ChatState>> {
 
   // }
 
-  Future<void> fetchChatsForFollowedUsers(List<String> followedUserIds) async {
+  // Future<void> fetchChatsForFollowedUsers(List<String> followedUserIds) async {
+  //   final List<Chat> chats = [];
+
+  //   for (final userId in followedUserIds) {
+  //     final chatSnapshot = await FirebaseFirestore.instance
+  //         .collection('chats')
+  //         .where('members', arrayContains: userId)
+  //         .get();
+
+  //     if (chatSnapshot.docs.isNotEmpty) {
+  //       print(chatSnapshot.docs[0].data());
+  //       final chat = Chat.fromSnap(chatSnapshot.docs[0]);
+  //       chats.add(chat);
+  //     } else {
+  //       String chatId = const Uuid().v1();
+  //       final emptyChat = Chat(
+  //         messages: [],
+  //         members: [userId, FirebaseAuth.instance.currentUser!.uid],
+  //         id: chatId,
+  //       );
+  //       _firestore.collection('chats').doc(chatId).set(emptyChat.toJson());
+  //       chats.add(emptyChat);
+  //     }
+  //   }
+
+  //   final chatStateList = chats.map((chat) => ChatState(chat)).toList();
+  //   emit(chatStateList);
+  // }
+  Stream<List<ChatState>> fetchChatsForFollowedUsers(
+    List<String> followedUserIds,
+  ) {
     final List<Chat> chats = [];
 
     for (final userId in followedUserIds) {
-      final chatSnapshot = await FirebaseFirestore.instance
+      final chatStream = FirebaseFirestore.instance
           .collection('chats')
           .where('members', arrayContains: userId)
-          .get();
+          .snapshots();
 
-      if (chatSnapshot.docs.isNotEmpty) {
-        print(chatSnapshot.docs[0].data());
-        final chat = Chat.fromSnap(chatSnapshot.docs[0]);
-        chats.add(chat);
-      } else {
-        String chatId = const Uuid().v1();
-        final emptyChat = Chat(
-          messages: [],
-          members: [userId, FirebaseAuth.instance.currentUser!.uid],
-          id: chatId,
-        );
-        _firestore.collection('chats').doc(chatId).set(emptyChat.toJson());
-        chats.add(emptyChat);
-      }
+      chatStream.listen((querySnapshot) {
+        if (querySnapshot.docs.isNotEmpty) {
+          final chat = Chat.fromSnap(querySnapshot.docs[0]);
+          final index = chats.indexWhere((c) => c.id == chat.id);
+          if (index != -1) {
+            // Chat with the same ID already exists in the list, remove it
+            chats.removeAt(index);
+          }
+          chats.add(chat);
+        } else {
+          String chatId = const Uuid().v1();
+          final emptyChat = Chat(
+            messages: [],
+            members: [userId, FirebaseAuth.instance.currentUser!.uid],
+            id: chatId,
+          );
+          _firestore.collection('chats').doc(chatId).set(emptyChat.toJson());
+          chats.add(emptyChat);
+        }
+
+        final chatStateList = chats.map((chat) => ChatState(chat)).toList();
+        emit(chatStateList);
+      });
     }
 
-    final chatStateList = chats.map((chat) => ChatState(chat)).toList();
-    emit(chatStateList);
+    if (followedUserIds.isEmpty) {
+      return Stream.value([]);
+    }
+
+    return stream;
   }
+
 }

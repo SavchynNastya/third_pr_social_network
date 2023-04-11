@@ -201,13 +201,14 @@ class _PostCard extends State<PostCard> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12.0),
                     child: IconButton(
-                      onPressed: (){
-                        Navigator.push(
+                      onPressed: () async{
+                        final commentsLength = await Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => OpenComments(postId: widget.post.postId),
                           ),
                         );
+                        print("COMMENTS LENGTH $commentsLength");
                       },
                       icon: Icon(Icons.chat_bubble_outline)
                     )

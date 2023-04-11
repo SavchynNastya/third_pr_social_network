@@ -78,10 +78,11 @@ class _SearchState extends State<Search>{
               if(hasUsername && hasPhotoUrl){
                 return InkWell(
                   onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          Account(userId: docs[index]['uid']),
-                    ));
+                    // Navigator.of(context).push(MaterialPageRoute(
+                    //   builder: (context) =>
+                    //       Account(userId: docs[index]['uid']),
+                    // ));
+                    Navigator.pushNamed(context, '/account', arguments: docs[index]['uid']);
                   },
                   child: AccountPreview(
                       username: docs[index]['username'],
