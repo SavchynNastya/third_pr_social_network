@@ -17,8 +17,6 @@ class AddStory extends StatefulWidget {
 
 class _AddStoryState extends State<AddStory> {
   late final user;
-  bool _loading = false;
-  final ImagePicker _picker = ImagePicker();
   Uint8List? _imageFile;
 
   void clearImage() {
@@ -28,9 +26,6 @@ class _AddStoryState extends State<AddStory> {
   }
 
   void postStory(String uid, String username, String profImage) async {
-    setState(() {
-      _loading = true;
-    });
     try {
       String res = await StoriesProvider().uploadStory(
         _imageFile!,
@@ -39,9 +34,6 @@ class _AddStoryState extends State<AddStory> {
         profImage,
       );
       if (res == "success") {
-        setState(() {
-          _loading = false;
-        });
         showSnackBar(
           context,
           'Posted!',
@@ -51,9 +43,6 @@ class _AddStoryState extends State<AddStory> {
         showSnackBar(context, res);
       }
     } catch (err) {
-      setState(() {
-        _loading = false;
-      });
       showSnackBar(
         context,
         err.toString(),
@@ -121,7 +110,7 @@ class _AddStoryState extends State<AddStory> {
               child: Center(
                 child: _imageFile != null
                     ? Image.memory(_imageFile!)
-                    : Text('No image selected.'),
+                    : const Text('No image selected.'),
               ),
             ),
             Row(
@@ -137,7 +126,7 @@ class _AddStoryState extends State<AddStory> {
                         },
                       )
                     : IconButton(
-                        icon: Icon(Icons.delete),
+                        icon: const Icon(Icons.delete),
                         onPressed: () {
                           clearImage();
                         },

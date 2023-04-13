@@ -1,55 +1,57 @@
+import 'dart:typed_data';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:social_network/nav_pages/reels/components/reel.dart';
 import 'package:social_network/errors_display/snackbar.dart';
-import 'dart:typed_data';
 import 'package:social_network/pick_image.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:social_network/models/reel.dart';
-import 'package:social_network/providers/reels_provider.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 
+import '../../cubit/reel_state.dart';
+import '../../cubit/reels_cubit.dart';
+import '../../providers/user_provider.dart';
 
-class Reels extends StatefulWidget{
-  final List usernames;
-  Reels({super.key, required this.usernames});
-
+class Reels extends StatefulWidget {
+  const Reels({super.key});
 
   @override
   State<Reels> createState() => _ReelsState();
-
 }
 
-class _ReelsState extends State<Reels>{
+class _ReelsState extends State<Reels> {
+  late final UserProvider user;
   List videoUrls = [];
 
   @override
   void initState() {
     super.initState();
-    fetchVideos();
+    user = Provider.of<UserProvider>(context, listen: false);
+    user.fetchUser();
+    // fetchVideos();
   }
 
-  dynamic parseJson(String responseBody){
-    final jsonBody = json.decode(responseBody);
-    final List<dynamic> videos = jsonBody['videos'];
-    return videos
-          .map((video) => '${video['video_files'][0]['link']}')
-          .toList();
-  }
+  // dynamic parseJson(String responseBody){
+  //   final jsonBody = json.decode(responseBody);
+  //   final List<dynamic> videos = jsonBody['videos'];
+  //   return videos
+  //         .map((video) => '${video['video_files'][0]['link']}')
+  //         .toList();
+  // }
 
-  Future<void> fetchVideos() async {
-    final response = await http.get(
-        Uri.parse('https://api.pexels.com/videos/search?query=spring&per_page=3&page=1'),
-                  headers: {'Authorization': '563492ad6f9170000100000102da905b8a4c42738c484891922b2be4'}); 
-    if (response.statusCode == 200) {
-      setState(() {
-        videoUrls = parseJson(response.body);
-      });
-      print(videoUrls);
-    } else {
-      print('Failed to fetch videos');
-    }
-  }
+  // Future<void> fetchVideos() async {
+  //   final response = await http.get(
+  //       Uri.parse('https://api.pexels.com/videos/search?query=spring&per_page=3&page=1'),
+  //                 headers: {'Authorization': '563492ad6f9170000100000102da905b8a4c42738c484891922b2be4'});
+  //   if (response.statusCode == 200) {
+  //     setState(() {
+  //       videoUrls = parseJson(response.body);
+  //     });
+  //     print(videoUrls);
+  //   } else {
+  //     print('Failed to fetch videos');
+  //   }
+  // }
 
   final PageController _pageController = PageController();
 
@@ -67,21 +69,25 @@ class _ReelsState extends State<Reels>{
                 padding: const EdgeInsets.all(20),
                 child: const Text('Film a video'),
                 onPressed: () async {
-                  // Navigator.pop(context);
-                  // Uint8List file = await pickVideo(ImageSource.camera);
-                  // setState(() {
-                  //   _file = file;
-                  // });
+                  Navigator.pop(context);
+                  Uint8List file = await pickVideo(ImageSource.camera);
+                  // File file = File.fromRawPath(bytes);
+                  setState(() {
+                    _file = file;
+                  });
+                  postVideo(user.uid, user.username, user.profilePic);
                 }),
             SimpleDialogOption(
                 padding: const EdgeInsets.all(20),
                 child: const Text('Choose from Gallery'),
                 onPressed: () async {
-                  // Navigator.of(context).pop();
-                  // Uint8List file = await pickVideo(ImageSource.gallery);
-                  // setState(() {
-                  //   _file = file;
-                  // });
+                  Navigator.of(context).pop();
+                  Uint8List file = await pickVideo(ImageSource.gallery);
+                  // File file = File.fromRawPath(bytes);
+                  setState(() {
+                    _file = file;
+                  });
+                  postVideo(user.uid, user.username, user.profilePic);
                 }),
             SimpleDialogOption(
               padding: const EdgeInsets.all(20),
@@ -107,9 +113,8 @@ class _ReelsState extends State<Reels>{
       _loading = true;
     });
     try {
-      String res = await ReelsProvider().uploadReel(
+      String res = await ReelCubit().addReel(
         _file!,
-        uid,
         username,
         profImage,
       );
@@ -138,34 +143,7 @@ class _ReelsState extends State<Reels>{
 
   @override
   Widget build(BuildContext context) {
-    print(videoUrls.length);
-    final List<Widget> reels = List.generate(videoUrls.length, (index) {
-      return Reel(username: widget.usernames[index], videoUrl: videoUrls[index]);
-    });
-    print(reels);
-
-    return reels.isEmpty ?
-    Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            'No reels yet',
-            style: TextStyle(color: Colors.grey[600]),
-          ),
-          TextButton(
-            onPressed: () => _selectVideo(context),
-            child: Text(
-              'Add',
-              style: TextStyle(color: Color.fromARGB(255, 60, 57, 221)),
-            ),
-          )
-        ],
-      ),
-    )
-    :
-    Scaffold(
+    return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -175,21 +153,77 @@ class _ReelsState extends State<Reels>{
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Reels', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-              // Icon(Icons.camera_alt_outlined, color: Colors.white,),
+              const Text(
+                'Reels',
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
               IconButton(
                 onPressed: () => _selectVideo(context),
-                icon: Icon(Icons.camera_alt_outlined, color: Colors.white,),
+                icon: const Icon(
+                  Icons.camera_alt_outlined,
+                  color: Colors.white,
+                ),
               )
             ],
           ),
         ),
       ),
-      body: PageView(
-        scrollDirection: Axis.vertical,
-        controller: _pageController,
-        padEnds: false,
-        children: reels,
+      // body: PageView(
+      //   scrollDirection: Axis.vertical,
+      //   controller: _pageController,
+      //   padEnds: false,
+      //   children: reels,
+      // ),
+      body: StreamBuilder<ReelState>(
+        stream: context.read<ReelCubit>().getReelsStreamByUserId(FirebaseAuth.instance.currentUser!.uid),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          }
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (snapshot.hasData && snapshot.data is ReelLoaded) {
+            final reels = (snapshot.data as ReelLoaded).reels;
+            if (reels == null || reels.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'No reels yet',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                    TextButton(
+                      onPressed: () => _selectVideo(context),
+                      child: const Text(
+                        'Add',
+                        style: TextStyle(color: Color.fromARGB(255, 60, 57, 221)),
+                      ),
+                    )
+                  ],
+                ),
+              );
+            }
+            final reelsCards = reels.map((item) => Reel(reel: item)).toList();
+            return PageView(
+              scrollDirection: Axis.vertical,
+              controller: _pageController,
+              padEnds: false,
+              children: reelsCards,
+            );
+          } else if (snapshot.hasData && snapshot.data is ReelError) {
+            return Center(child: Text((snapshot.data as ReelError).message));
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
       ),
     );
   }

@@ -17,6 +17,14 @@ class _DirectState extends State<Direct> {
   final TextEditingController _searchController = TextEditingController();
   bool showSearchedChats = false;
 
+  List<Chat> _chats = [];
+
+  void _updateChats(List<Chat> chats) {
+    setState(() {
+      _chats = chats;
+    });
+  }
+
   // @override
   // void dispose() {
   //   // user.clear();
@@ -133,7 +141,7 @@ class _DirectState extends State<Direct> {
                                   .fetchChatsForFollowedUsers(ids),
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState == ConnectionState.waiting) {
-                                  return Center(child: CircularProgressIndicator());
+                                  return const Center(child: CircularProgressIndicator());
                                 } else if (snapshot.hasError) {
                                   return Center(child: Text('Error: ${snapshot.error}'));
                                 } else {
@@ -149,7 +157,7 @@ class _DirectState extends State<Direct> {
                                       return InkWell(
                                         onTap: () {
                                           Navigator.of(context).push(MaterialPageRoute(
-                                            builder: (context) => Chat(chat: chats[index]),
+                                            builder: (context) => Chat(chat: chats[index], index: index),
                                           ));
                                         },
                                         child: DialogLabel(
@@ -244,7 +252,7 @@ class _DirectState extends State<Direct> {
                               builder: (context, snapshot) {
                                 if (snapshot.connectionState ==
                                     ConnectionState.waiting) {
-                                  return Center(
+                                  return const Center(
                                       child: CircularProgressIndicator());
                                 } else if (snapshot.hasError) {
                                   return Center(
@@ -254,9 +262,7 @@ class _DirectState extends State<Direct> {
                                           ?.map((chatState) => chatState.chat)
                                           .toList() ??
                                       [];
-
-                                      print(chats);
-
+                                      // print(chats);
                                   return ListView.builder(
                                     itemCount: chats.length,
                                     itemBuilder: (context, index) {
@@ -265,7 +271,7 @@ class _DirectState extends State<Direct> {
                                           Navigator.of(context)
                                               .push(MaterialPageRoute(
                                             builder: (context) =>
-                                                Chat(chat: chats[index]),
+                                                Chat(chat: chats[index], index: index),
                                           ));
                                         },
                                         child: DialogLabel(

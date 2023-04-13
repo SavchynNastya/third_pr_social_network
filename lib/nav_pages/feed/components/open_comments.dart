@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:social_network/models/comment.dart';
+import '../../../cubit/reels_cubit.dart';
 import './comment_view.dart';
 import 'package:provider/provider.dart';
 import 'package:social_network/cubit/posts_cubit.dart';
@@ -9,7 +10,8 @@ import 'package:social_network/providers/user_provider.dart';
 
 class OpenComments extends StatefulWidget {
   String postId;
-  OpenComments({super.key, required this.postId});
+  final bool isReel;
+  OpenComments({super.key, required this.postId, required this.isReel});
 
   @override
   State<OpenComments> createState() => _OpenCommentsState();
@@ -27,17 +29,19 @@ class _OpenCommentsState extends State<OpenComments> {
     )
   );
 
+  late final UserProvider user;
+
+  @override
+  void initState(){
+    super.initState();
+
+    user = Provider.of<UserProvider>(context, listen: false);
+    user.fetchUser();
+  }
+
 
   @override
   Widget build(BuildContext context) {
-
-    final postCubit = context.watch<PostsCubit>();
-    final postCommentsStream = postCubit.fetchPostComments(widget.postId);
-
-
-    final user = Provider.of<UserProvider>(context, listen: false);
-    user.fetchUser();
-
     return WillPopScope(
       onWillPop: () async {
         Navigator.pop(context, commentsLength);
@@ -54,26 +58,9 @@ class _OpenCommentsState extends State<OpenComments> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              // child: StreamBuilder<List<Comment>>(
-              //   stream: widget.commentsStream,
-              //   initialData: List.from(widget.comments)..addAll(_comments),
-              //   builder: (BuildContext context,
-              //       AsyncSnapshot<List<Comment>> snapshot) {
-              //     if (snapshot.hasData) {
-              // return ListView.builder(
-              //   itemCount: snapshot.data!.length,
-              //   itemBuilder: (context, index) {
-              //     return CommentView(comment: snapshot.data![index]);
-              //   },
-              // );
-              //     } else {
-              //       return Center(child: CircularProgressIndicator());
-              //     }
-              //   },
-              // ),
-
               child: StreamBuilder<List<Comment>>(
-                stream: postCommentsStream,
+                stream: widget.isReel ? context.watch<ReelCubit>().fetchReelComments(widget.postId)
+                                      : context.watch<PostsCubit>().fetchPostComments(widget.postId),
                 builder: (BuildContext context,
                     AsyncSnapshot<List<Comment>> snapshot) {
                   if (snapshot.hasData) {
@@ -95,7 +82,7 @@ class _OpenCommentsState extends State<OpenComments> {
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else {
-                    return Center(child: CircularProgressIndicator());
+                    return const Center(child: CircularProgressIndicator());
                   }
                 },
               ),
@@ -104,7 +91,7 @@ class _OpenCommentsState extends State<OpenComments> {
               children: [
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.only(bottom: 10, left: 8, right: 8),
+                    padding: const EdgeInsets.only(bottom: 10, left: 8, right: 8),
                     child: TextField(
                       autofocus: false,
                       controller: commentController,
@@ -114,12 +101,15 @@ class _OpenCommentsState extends State<OpenComments> {
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    print(newComment);
                     setState(() {
                       newComment = commentController.text;
-                      postCubit.postComment(widget.postId, newComment, user.uid,
+                      if(widget.isReel){
+                        context.read<ReelCubit>().commentReel(widget.postId, newComment, user.uid,
+                              user.username, user.profilePic);
+                      } else {
+                        context.read<PostsCubit>().postComment(widget.postId, newComment, user.uid,
                           user.username, user.profilePic);
-                      // widget.updateComments?.call(newComment, widget.postId);
+                      }
                       newComment = '';
                       commentController.clear();
                       FocusScope.of(context).unfocus();

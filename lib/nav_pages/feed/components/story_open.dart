@@ -17,21 +17,14 @@ class StoryOpen extends StatefulWidget {
 }
 
 class _StoryOpenState extends State<StoryOpen>{
-  late bool _loading;
 
   final collectionNameController = TextEditingController();
 
   void addCollection(String uid, String storyId) async {
-    setState(() {
-      _loading = true;
-    });
     try {
       String res = await StoryCollectionProvider().createStoryCollection(
         uid, collectionNameController.text, storyId);
       if (res == "success") {
-        setState(() {
-          _loading = false;
-        });
         showSnackBar(
           context,
           'Created!',
@@ -40,9 +33,6 @@ class _StoryOpenState extends State<StoryOpen>{
         showSnackBar(context, res);
       }
     } catch (err) {
-      setState(() {
-        _loading = false;
-      });
       showSnackBar(
         context,
         err.toString(),
@@ -51,16 +41,10 @@ class _StoryOpenState extends State<StoryOpen>{
   }
 
   void addStoryToCollection(String collectionId, String storyId) async {
-    setState(() {
-      _loading = true;
-    });
     try {
       String res = await StoryCollectionProvider()
           .addStoryToCollection(collectionId, storyId);
       if (res == "success") {
-        setState(() {
-          _loading = false;
-        });
         showSnackBar(
           context,
           'Added!',
@@ -69,9 +53,6 @@ class _StoryOpenState extends State<StoryOpen>{
         showSnackBar(context, res);
       }
     } catch (err) {
-      setState(() {
-        _loading = false;
-      });
       showSnackBar(
         context,
         err.toString(),
@@ -80,16 +61,10 @@ class _StoryOpenState extends State<StoryOpen>{
   }
 
   void removeFromCollection(String collectionId, String storyId) async {
-    setState(() {
-      _loading = true;
-    });
     try {
       String res = await StoryCollectionProvider()
           .removeFromCollection(collectionId, storyId);
       if (res == "success") {
-        setState(() {
-          _loading = false;
-        });
         showSnackBar(
           context,
           'Removed!',
@@ -98,9 +73,6 @@ class _StoryOpenState extends State<StoryOpen>{
         showSnackBar(context, res);
       }
     } catch (err) {
-      setState(() {
-        _loading = false;
-      });
       showSnackBar(
         context,
         err.toString(),
@@ -121,7 +93,7 @@ class _StoryOpenState extends State<StoryOpen>{
                   stream: StoryCollectionProvider().fetchCollections(FirebaseAuth.instance.currentUser!.uid),
                   builder: (BuildContext context,
                       AsyncSnapshot<List<StoryCollection>> snapshot) {
-                        print(snapshot);
+                        // print(snapshot);
                     if (snapshot.hasError) {
                       return Text('Error: ${snapshot.error}');
                     } else if (!snapshot.hasData) {
@@ -196,15 +168,9 @@ class _StoryOpenState extends State<StoryOpen>{
   }
 
   void deleteStory(String storyId) async {
-    setState(() {
-      _loading = true;
-    });
     try {
       String res = await StoriesProvider().deleteStory(storyId);
       if (res == "success") {
-        setState(() {
-          _loading = false;
-        });
         showSnackBar(
           context,
           'Story has been successfully deleted.',
@@ -213,9 +179,6 @@ class _StoryOpenState extends State<StoryOpen>{
         showSnackBar(context, res);
       }
     } catch (err) {
-      setState(() {
-        _loading = false;
-      });
       showSnackBar(
         context,
         err.toString(),
@@ -358,7 +321,7 @@ class _StoryOpenState extends State<StoryOpen>{
                             stream: StoryCollectionProvider().fetchCollectionsWhereStoryPresent(FirebaseAuth.instance.currentUser!.uid, widget.story.storyId),
                             builder: (BuildContext context,
                                 AsyncSnapshot<List<StoryCollection>> snapshot) {
-                                  print(snapshot);
+                                  // print(snapshot);
                               if (snapshot.hasError) {
                                 return Text('Error: ${snapshot.error}');
                               } else if (!snapshot.hasData) {

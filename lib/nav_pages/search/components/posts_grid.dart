@@ -6,7 +6,7 @@ import 'package:social_network/models/post.dart';
 class PostsGrid extends StatelessWidget {
   final postsSnapshot;
 
-  PostsGrid({super.key, required this.postsSnapshot});
+  const PostsGrid({super.key, required this.postsSnapshot});
 
   @override
   Widget build(BuildContext context){

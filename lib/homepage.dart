@@ -37,12 +37,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     super.initState();
 
     _children.addAll([
-      Feed(),
+      const Feed(),
       const Search(),
       const AddPhoto(),
-      Reels(
-        usernames: usernames,
-      ),
+      const Reels(),
       Account(
         userId: FirebaseAuth.instance.currentUser!.uid,
       ),

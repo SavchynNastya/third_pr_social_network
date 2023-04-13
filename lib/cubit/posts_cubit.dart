@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:social_network/models/post.dart';
 import 'package:social_network/models/comment.dart';
@@ -16,20 +15,8 @@ class PostsCubit extends Cubit<PostsStorage>{
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Future<void> fetchFeedPosts(String userId) async {
-    
-  //   final postsSnapshot = await FirebaseFirestore.instance
-  //       .collection('posts')
-  //       .where('uid', isNotEqualTo: userId)
-  //       .orderBy('datePublished', descending: true)
-  //       .get();
-  //   final feedPosts = postsSnapshot.docs.map((doc) => Post.fromSnap(doc)).toList();
-    
-  //   // final currentState = state.copyWith(feedPosts: feedPosts);
-  //   // emit(currentState);
-  // }
   Stream<List<Post>> feedPostsStream(String userId) {
-    print(userId);
+    // print(userId);
     return _firestore
         .collection('posts')
         .orderBy('datePublished', descending: true)
@@ -51,31 +38,6 @@ class PostsCubit extends Cubit<PostsStorage>{
     final currentState = state.copyWith(posts: posts);
     emit(currentState);
   }
-
-  // Future<void> fetchSavedPosts(String userId) async {
-
-  //   final savedPostSnap = await FirebaseFirestore.instance
-  //       .collection('posts')
-  //       .where('savings', arrayContains: userId)
-  //       .get();
-  //   final savedPosts =
-  //       savedPostSnap.docs.map((doc) => Post.fromSnap(doc)).toList();
-    
-  //   // final currentState = state.copyWith(savedPosts: savedPosts);
-  //   // emit(currentState);
-  // }
-
-  // Future<void> fetchLikedPosts(String userId) async {
-  //   final likedPostSnap = await FirebaseFirestore.instance
-  //       .collection('posts')
-  //       .where('likes', arrayContains: userId)
-  //       .get();
-  //   final likedPosts =
-  //       likedPostSnap.docs.map((doc) => Post.fromSnap(doc)).toList();
-    
-  //   final currentState = state.copyWith(likedPosts: likedPosts);
-  //   emit(currentState);
-  // }
 
   Stream<List<Post>> likedPostsStream(String userId) {
     return _firestore
@@ -208,20 +170,6 @@ class PostsCubit extends Cubit<PostsStorage>{
     return res;
   }
 
-  // Future<String> deletePost(String postId) async {
-  //   String res = "Error";
-  //   try {
-  //     await _firestore.collection('posts').doc(postId).delete();
-  //     final currentState = state;
-  //     currentState.posts.removeWhere((post) => post.postId == postId);
-  //     emit(currentState);
-
-  //     res = 'success';
-  //   } catch (err) {
-  //     res = err.toString();
-  //   }
-  //   return res;
-  // }
 
   Future<String> deletePost(String postId) {
     return _firestore.collection('posts').doc(postId).delete().then((value) {

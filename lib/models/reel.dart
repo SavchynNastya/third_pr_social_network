@@ -5,6 +5,7 @@ class ReelItem {
   final String uid;
   final String username;
   final List likes;
+  final List comments;
   final String reelId;
   final DateTime datePublished;
   final String reelUrl;
@@ -13,6 +14,7 @@ class ReelItem {
     required this.uid,
     required this.username,
     required this.likes,
+    required this.comments,
     required this.reelId,
     required this.datePublished,
     required this.reelUrl,
@@ -25,6 +27,7 @@ class ReelItem {
     return ReelItem(
     uid: snapshot["uid"],
     likes: snapshot["likes"],
+    comments: snapshot['comments'],
     reelId: snapshot["reelId"],
     datePublished: snapshot["datePublished"].toDate(),
     username: snapshot["username"],
@@ -35,10 +38,34 @@ class ReelItem {
   Map<String, dynamic> toJson() => {
     "uid": uid,
     "likes": likes,
+    "comments": comments,
     "username": username,
     "reelId": reelId,
     "datePublished": datePublished,
     'reelUrl': reelUrl,
     'profImage': profImage,
   };
+
+  ReelItem copyWith({
+    String? uid,
+    String? username,
+    List? likes,
+    List? comments,
+    String? reelId,
+    DateTime? datePublished,
+    String? reelUrl,
+    String? profImage,
+  }) {
+    return ReelItem(
+      uid: uid ?? this.uid,
+      username: username ?? this.username,
+      likes: likes ?? this.likes,
+      comments: comments ?? this.comments,
+      reelId: reelId ?? this.reelId,
+      datePublished: datePublished ?? this.datePublished,
+      reelUrl: reelUrl ?? this.reelUrl,
+      profImage: profImage ?? this.profImage,
+    );
+  }
+
 }

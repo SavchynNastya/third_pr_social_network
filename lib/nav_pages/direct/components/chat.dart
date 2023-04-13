@@ -8,7 +8,8 @@ import 'package:social_network/models/message.dart' as message_model;
 
 class Chat extends StatefulWidget {
   final dynamic chat;
-  const Chat({super.key, required this.chat});
+  final int index;
+  const Chat({super.key, required this.chat, required this.index});
 
   @override
   State<Chat> createState() => _ChatState();
@@ -58,8 +59,6 @@ class _ChatState extends State<Chat>{
   }
 
   void deleteMessage(BuildContext parentContext, message_model.Message message) async{
-    // final ChatCubit chatCubit =
-    //     BlocProvider.of<ChatCubit>(parentContext, listen: false);
       return showDialog(
         context: parentContext,
         builder: (BuildContext context) {
@@ -74,8 +73,6 @@ class _ChatState extends State<Chat>{
                   BlocProvider.of<ChatCubit>(context, listen: false)
                       .deleteMessage(
                           widget.chat.id, message);
-                  // chatCubit.deleteMessage(widget.chat.id, message);
-                  setState(() {});
                 }),
             SimpleDialogOption(
               padding: const EdgeInsets.all(20),
@@ -122,30 +119,21 @@ class _ChatState extends State<Chat>{
         ),
         body: Column(
           children: [
-            // StreamBuilder<List<message_model.Message>>(
-            //   stream: context.watch<ChatCubit>().messagesStream(widget.chat.id),
-            //   builder: (BuildContext context, AsyncSnapshot<List<message_model.Message>> snapshot) {
-            //     if (snapshot.hasError) {
-            //       return Text('Error: ${snapshot.error}');
-            //     }
-
-            //     if (!snapshot.hasData) {
-            //       return const CircularProgressIndicator();
-            //     }
-
-            //     List<message_model.Message> messages = snapshot.data!;
-            //     print(messages);
-
             Expanded(
-              child: ListView.builder(
-                itemCount: widget.chat.messages.length,
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    onLongPress: () => deleteMessage(context, widget.chat.messages[index]),
-                    child: Message(
-                      message: widget.chat.messages[index],
-                    ),
-                  );
+              child: BlocBuilder<ChatCubit, List<ChatState>>(
+                builder: (context, state) {
+                    return ListView.builder(
+                      itemCount: state[widget.index].chat.messages.length,
+                      itemBuilder: (context, index) {
+                        return InkWell(
+                          onLongPress: () => deleteMessage(
+                              context, state[widget.index].chat.messages[index]),
+                          child: Message(
+                            message: state[widget.index].chat.messages[index],
+                          ),
+                        );
+                      },
+                    );
                 },
               ),
             ),

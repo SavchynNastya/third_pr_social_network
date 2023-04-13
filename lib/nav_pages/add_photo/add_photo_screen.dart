@@ -13,7 +13,7 @@ class AddPhoto extends StatefulWidget {
   const AddPhoto({super.key});
 
   @override
-  _AddPhotoState createState() => _AddPhotoState();
+  State<AddPhoto> createState() => _AddPhotoState();
 }
 
 class _AddPhotoState extends State<AddPhoto> {

@@ -7,6 +7,7 @@ environment:
   sdk: '>=2.19.2 <3.0.0'
 
 dependencies:
+  bloc: ^8.1.1
   chewie: ^1.4.0
   cloud_firestore: ^4.4.5
   equatable: ^2.0.5

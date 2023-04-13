@@ -13,12 +13,9 @@ import 'package:provider/provider.dart';
 import 'package:social_network/nav_pages/feed/components/post.dart';
 import 'package:social_network/nav_pages/add_story/add_story_screen.dart';
 import 'package:social_network/providers/story_provider.dart';
-import 'package:social_network/models/story.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_network/models/posts_storage.dart';
 
 class Feed extends StatefulWidget {
-  Feed({super.key}) ;
+  const Feed({super.key}) ;
 
   @override
   State<Feed> createState() => _FeedState();

@@ -20,8 +20,6 @@ import 'package:social_network/cubit/posts_cubit.dart';
 import 'package:social_network/nav_pages/account/components/theme_toggle.dart';
 import 'package:social_network/models/post.dart';
 
-import 'package:social_network/theme.dart';
-
 class Account extends StatefulWidget {
   final String userId;
 
@@ -43,7 +41,7 @@ class _Account extends State<Account> {
 
   final ButtonStyle elevatedButtonStyle = ElevatedButton.styleFrom(
     foregroundColor: Colors.white,
-    backgroundColor: Color.fromARGB(255, 192, 192, 192),
+    backgroundColor: const Color.fromARGB(255, 192, 192, 192),
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.all(Radius.circular(10)),
     ),
@@ -153,7 +151,7 @@ class _Account extends State<Account> {
                                       builder: (context, snapshot) {
                                         if (snapshot.connectionState ==
                                             ConnectionState.waiting) {
-                                          return CircularProgressIndicator();
+                                          return const CircularProgressIndicator();
                                         }
                                         if (snapshot.hasError) {
                                           return Text(
@@ -189,7 +187,7 @@ class _Account extends State<Account> {
                                       builder: (context, snapshot) {
                                         if (snapshot.connectionState ==
                                             ConnectionState.waiting) {
-                                          return CircularProgressIndicator();
+                                          return const CircularProgressIndicator();
                                         }
                                         if (snapshot.hasError) {
                                           return Text(
@@ -238,7 +236,7 @@ class _Account extends State<Account> {
                             SizedBox(
                               width: 150,
                               child: ListTile(
-                                leading: ThemeToggle(),
+                                leading: const ThemeToggle(),
                                 title: Text(
                                   'Dark theme',
                                   style: Theme.of(context).textTheme.labelMedium,
@@ -318,7 +316,7 @@ class _Account extends State<Account> {
                                       style: elevatedButtonStyle,
                                       child: Padding(
                                         padding:
-                                            EdgeInsets.only(left: 5, right: 5),
+                                            const EdgeInsets.only(left: 5, right: 5),
                                         child: Text('Edit profile',
                                             style: TextStyle(
                                                 color: Theme.of(context)
@@ -375,7 +373,7 @@ class _Account extends State<Account> {
                                 onPressed: () {},
                                 style: elevatedButtonStyle,
                                 child: Padding(
-                                  padding: EdgeInsets.only(left: 5, right: 5),
+                                  padding: const EdgeInsets.only(left: 5, right: 5),
                                   child: Text('Share profile',
                                       style: TextStyle(
                                           color: Theme.of(context)
@@ -386,7 +384,7 @@ class _Account extends State<Account> {
                                 onPressed: () {},
                                 style: elevatedButtonStyle,
                                 child: Padding(
-                                  padding: EdgeInsets.only(left: 5, right: 5),
+                                  padding: const EdgeInsets.only(left: 5, right: 5),
                                   child: Icon(Icons.group_add_outlined,
                                       color: Theme.of(context).primaryColor),
                                 ),
@@ -404,7 +402,7 @@ class _Account extends State<Account> {
                                   .fetchCollections(user.uid),
                               builder: (context, snapshot) {
                                 if (!snapshot.hasData) {
-                                  return CircularProgressIndicator();
+                                  return const CircularProgressIndicator();
                                 }
                                 List<StoryCollection> collections =
                                     snapshot.data!;
@@ -441,7 +439,7 @@ class _Account extends State<Account> {
                                           ),
                                         ),
                                       )
-                                    : SizedBox.shrink();
+                                    : const SizedBox.shrink();
                               },
                             ),
                           ],

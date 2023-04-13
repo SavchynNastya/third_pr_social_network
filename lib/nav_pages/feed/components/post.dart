@@ -8,37 +8,29 @@ import './comment.dart';
 import 'package:social_network/models/post.dart';
 import 'package:provider/provider.dart';
 import 'package:social_network/cubit/posts_cubit.dart';
-import 'package:social_network/providers/user_provider.dart';
 import 'package:social_network/errors_display/snackbar.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class PostCard extends StatefulWidget {
   final Post post;
 
-  PostCard({super.key, required this.post});
+  const PostCard({super.key, required this.post});
 
   @override
   State<PostCard> createState() => _PostCard();
 }
 
 class _PostCard extends State<PostCard> {
-  late bool _loading;
   late StreamSubscription<List<dynamic>> _commentsSubscription;
 
   List comments = [];
 
   void deleteImage(String postId) async {
-    setState(() {
-      _loading = true;
-    });
     try {
       String res = await PostsCubit().deletePost(
         widget.post.postId
       );
       if (res == "success") {
-        setState(() {
-          _loading = false;
-        });
         showSnackBar(
           context,
           'Post has been successfully deleted.',
@@ -47,9 +39,6 @@ class _PostCard extends State<PostCard> {
         showSnackBar(context, res);
       }
     } catch (err) {
-      setState(() {
-        _loading = false;
-      });
       showSnackBar(
         context,
         err.toString(),
@@ -205,7 +194,7 @@ class _PostCard extends State<PostCard> {
                         final commentsLength = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => OpenComments(postId: widget.post.postId),
+                            builder: (context) => OpenComments(postId: widget.post.postId, isReel: false,),
                           ),
                         );
                         print("COMMENTS LENGTH $commentsLength");
@@ -257,7 +246,7 @@ class _PostCard extends State<PostCard> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => OpenComments(postId: widget.post.postId,)
+                      builder: (context) => OpenComments(postId: widget.post.postId, isReel: false,)
                     ),
                   );
                 },

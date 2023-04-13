@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:social_network/models/story_collection.dart';
 import 'package:social_network/providers/story_provider.dart';
 import 'package:social_network/models/story.dart';
-import 'package:social_network/providers/story_collection_provider.dart';
-import 'package:social_network/models/story_collection.dart';
-import 'package:social_network/errors_display/snackbar.dart';
 
 class StoryCollectionCircle extends StatefulWidget {
   final StoryCollection collection;
