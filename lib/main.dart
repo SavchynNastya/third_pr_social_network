@@ -7,8 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:social_network/cubit/chat_cubit.dart';
 import 'package:social_network/cubit/posts_cubit.dart';
 import 'package:social_network/cubit/reels_cubit.dart';
-import 'package:social_network/nav_pages/account/account_screen.dart';
-import 'package:social_network/nav_pages/feed/feed_screen.dart';
+// import 'package:social_network/nav_pages/account/account_screen.dart';
 import 'package:social_network/providers/user_provider.dart';
 import 'package:social_network/nav_pages/auth/login_screen.dart';
 import 'package:social_network/providers/story_provider.dart';
@@ -44,15 +43,15 @@ class MainApp extends StatelessWidget {
             // routes: {
             //   '/feed': (context) => Feed(),
             // },
-            onGenerateRoute: (settings) {
-              if (settings.name == '/account') {
-                final String? userId = settings.arguments as String?;
-                return MaterialPageRoute(
-                  builder: (context) => Account(userId: userId ?? ''),
-                );
-              }
-              return null;
-            },
+            // onGenerateRoute: (settings) {
+            //   if (settings.name == '/account') {
+            //     final String? userId = settings.arguments as String?;
+            //     return MaterialPageRoute(
+            //       builder: (context) => Account(userId: userId ?? ''),
+            //     );
+            //   }
+            //   return null;
+            // },
             debugShowCheckedModeBanner: false,
             theme: ThemeData.light(),
             darkTheme: ThemeData.dark(),

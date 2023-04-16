@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_network/homepage.dart';
 import 'package:social_network/nav_pages/auth/components/text_input.dart';
 import 'package:image_picker/image_picker.dart';
@@ -56,6 +57,9 @@ class _SignUpState extends State<SignUp> {
       setState(() {
         _loading = false;
       });
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('loggedInBefore', true);
 
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const HomePage()),

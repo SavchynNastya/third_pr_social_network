@@ -1,5 +1,6 @@
 // ignore_for_file: sort_child_properties_last, prefer_const_constructors
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_network/authentication/auth.dart';
 import 'package:social_network/homepage.dart';
 import './sign_up_screen.dart';
@@ -39,6 +40,9 @@ class _LoginState extends State<Login> {
     );
 
     if(response == "success"){
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('loggedInBefore', true);
+
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (context) => HomePage(),
