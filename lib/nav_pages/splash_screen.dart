@@ -1,12 +1,11 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:social_network/homepage.dart';
-import 'package:social_network/nav_pages/feed/feed_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
@@ -39,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     return Center(
       child: SlideTransition(
         position: Tween<Offset>(
-          begin: Offset(-1, 0),
+          begin: const Offset(-1, 0),
           end: Offset.zero,
         ).animate(_animationController),
         child: Column(
