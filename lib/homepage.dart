@@ -21,15 +21,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   List<PostCard> savedPosts = [];
   final List<Widget> _children = [];
 
-  static const List usernames = [
-    'lyboff',
-    'yulicccka',
-    'slava_aysa',
-    'marineet_',
-    'lbundzyak',
-    'bondziakigor',
-    'https.v_d'
+  final List<GlobalKey<NavigatorState>> _navigatorKeys = [
+    GlobalKey<NavigatorState>(),
+    GlobalKey<NavigatorState>(),
+    GlobalKey<NavigatorState>(),
+    GlobalKey<NavigatorState>(),
+    GlobalKey<NavigatorState>(),
   ];
+
+  // static const List usernames = [
+  //   'lyboff',
+  //   'yulicccka',
+  //   'slava_aysa',
+  //   'marineet_',
+  //   'lbundzyak',
+  //   'bondziakigor',
+  //   'https.v_d'
+  // ];
 
 
   @override
@@ -57,7 +65,36 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _children[_selectedItem],
+      body: WillPopScope(
+        onWillPop: () async {
+          final NavigatorState navigator =
+              _navigatorKeys[_selectedItem].currentState!;
+          if (navigator.canPop()) {
+            navigator.pop();
+            return false;
+          }
+          return true;
+        },
+        child: IndexedStack(
+          index: _selectedItem,
+          children: _children
+              .asMap()
+              .map((i, page) => MapEntry(
+                  i,
+                  Navigator(
+                    key: _navigatorKeys[i],
+                    onGenerateRoute: (route) => MaterialPageRoute(
+                      settings: route,
+                      builder: (context) => page,
+                    ),
+                  ),
+                ),
+              )
+              .values
+              .toList(),
+        ),
+      ),
+      // _children[_selectedItem],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedItem,
         onTap: _navigateBottomNavBar,
@@ -144,4 +181,33 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
     );
   }
+
+  // void _onTap(int val, BuildContext context) {
+  //   if (_selectedItem == val) {
+  //     switch (val) {
+  //       case 0:
+  //         _feedScreen.currentState?.popUntil((route) => route.isFirst);
+  //         break;
+  //       case 1:
+  //         _searchScreen.currentState?.popUntil((route) => route.isFirst);
+  //         break;
+  //       case 2:
+  //         _addScreen.currentState?.popUntil((route) => route.isFirst);
+  //         break;
+  //       case 3:
+  //         _reelsScreen.currentState?.popUntil((route) => route.isFirst);
+  //         break;
+  //       case 4:
+  //         _accountScreen.currentState?.popUntil((route) => route.isFirst);
+  //         break;
+  //       default:
+  //     }
+  //   } else {
+  //     if (mounted) {
+  //       setState(() {
+  //         _selectedItem = val;
+  //       });
+  //     }
+  //   }
+  // }
 }
